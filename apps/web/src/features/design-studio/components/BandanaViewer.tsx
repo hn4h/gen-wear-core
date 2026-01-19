@@ -42,7 +42,7 @@ function BandanaMesh({ textureUrl }: { textureUrl?: string }) {
     );
 }
 
-export default function BandanaViewer({ textureUrl }: { textureUrl?: string }) {
+export function BandanaViewer({ textureUrl }: { textureUrl?: string }) {
     return (
         <div className="w-full h-full bg-slate-100 dark:bg-slate-900 rounded-lg overflow-hidden relative">
             <Canvas camera={{ position: [0, 5, 5], fov: 45 }}>

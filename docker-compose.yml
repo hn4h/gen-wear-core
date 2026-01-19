@@ -27,6 +27,7 @@ services:
     ports:
       - "8000:8000"
     environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
       - DATABASE_URL=postgresql://user:password@postgres:5432/genwear
       - REDIS_URL=redis://redis:6379
     depends_on:
