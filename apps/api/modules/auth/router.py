@@ -2,10 +2,12 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from apps.api.modules.auth.schemas import (
     RegisterRequest, RegisterResponse, 
-    LoginRequest, TokenResponse, UserResponse
+    LoginRequest, TokenResponse, UserResponse,
+    UserProfileUpdate, PasswordChange
 )
 from apps.api.modules.auth.service import (
-    create_user, authenticate_user, create_access_token, get_current_user
+    create_user, authenticate_user, create_access_token, get_current_user,
+    update_user, change_password
 )
 from apps.api.modules.auth.database import get_db
 from apps.api.modules.auth.models import User
@@ -57,6 +59,7 @@ async def login(request: LoginRequest, db: Session = Depends(get_db)):
             id=str(user.id),
             phone_number=user.phone_number,
             full_name=user.full_name,
+            role=user.role,
             created_at=user.created_at,
             is_active=user.is_active
         )
@@ -69,6 +72,36 @@ async def get_me(current_user: User = Depends(get_current_user)):
         id=str(current_user.id),
         phone_number=current_user.phone_number,
         full_name=current_user.full_name,
+        role=current_user.role,
         created_at=current_user.created_at,
         is_active=current_user.is_active
     )
+
+@router.put("/me", response_model=UserResponse)
+async def update_profile(
+    request: UserProfileUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Update current user profile"""
+    if request.full_name:
+        current_user = update_user(db, current_user, request.full_name)
+    
+    return UserResponse(
+        id=str(current_user.id),
+        phone_number=current_user.phone_number,
+        full_name=current_user.full_name,
+        role=current_user.role,
+        created_at=current_user.created_at,
+        is_active=current_user.is_active
+    )
+
+@router.put("/me/password", status_code=status.HTTP_200_OK)
+async def update_password(
+    request: PasswordChange,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Change current user password"""
+    change_password(db, current_user, request.current_password, request.new_password)
+    return {"message": "Password updated successfully"}

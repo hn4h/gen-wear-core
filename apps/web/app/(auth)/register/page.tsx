@@ -87,8 +87,12 @@ export default function RegisterPage() {
       const loginResponse = await authAPI.login(phoneNumber, password);
       login(loginResponse.user, loginResponse.access_token);
       
-      // Redirect to home
-      router.push('/');
+      // Redirect based on role
+      if (loginResponse.user.role === 'ADMIN') {
+        router.push('/admin');
+      } else {
+        router.push('/');
+      }
     } catch (err: any) {
       console.error('Registration error:', err);
       if (err.response?.data?.detail) {

@@ -100,3 +100,34 @@ def get_current_user(
         )
     
     return user
+
+def update_user(db: Session, user: User, full_name: str) -> User:
+    """Update user profile"""
+    user.full_name = full_name
+    db.commit()
+    db.refresh(user)
+    return user
+
+def change_password(db: Session, user: User, current_password: str, new_password: str) -> User:
+    """Change user password"""
+    if not verify_password(current_password, user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Incorrect password"
+        )
+    
+    user.hashed_password = hash_password(new_password)
+    db.commit()
+    db.refresh(user)
+    return user
+
+def get_current_admin_user(
+    current_user: User = Depends(get_current_user)
+) -> User:
+    """Validate that the current user is an admin"""
+    if current_user.role != "ADMIN":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="The user doesn't have enough privileges"
+        )
+    return current_user

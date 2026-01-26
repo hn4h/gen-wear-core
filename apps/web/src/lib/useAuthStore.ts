@@ -1,10 +1,11 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
-interface User {
+export interface User {
   id: string;
   phone_number: string;
   full_name: string;
+  role?: string;
   created_at: string;
   is_active: boolean;
 }
@@ -25,28 +26,33 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       token: null,
       isAuthenticated: false,
-      
       setUser: (user) => set({ user, isAuthenticated: !!user }),
-      
       setToken: (token) => set({ token }),
-      
       login: (user, token) => {
         set({ user, token, isAuthenticated: true });
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('auth_token', token);
-        }
       },
-      
       logout: () => {
         set({ user: null, token: null, isAuthenticated: false });
-        if (typeof window !== 'undefined') {
-          localStorage.removeItem('auth_token');
-        }
       },
     }),
     {
       name: 'auth-storage',
-      partialize: (state) => ({ token: state.token }),
+      storage: createJSONStorage(() => typeof window !== 'undefined' ? localStorage : {
+        getItem: () => null,
+        setItem: () => {},
+        removeItem: () => {},
+      }), 
+      partialize: (state) => ({ 
+        token: state.token,
+        user: state.user,
+        isAuthenticated: state.isAuthenticated 
+      }),
     }
   )
 );
+
+export const getAuthToken = () => {
+    // Access the state directly from the store
+    const state = useAuthStore.getState();
+    return state.token;
+};

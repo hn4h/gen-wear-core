@@ -61,8 +61,12 @@ export default function LoginPage() {
       // Update store
       login(response.user, response.access_token);
       
-      // Redirect to home
-      router.push('/');
+      // Redirect based on role
+      if (response.user.role === 'ADMIN') {
+        router.push('/admin');
+      } else {
+        router.push('/');
+      }
     } catch (err: any) {
       console.error('Login error:', err);
       if (err.response?.data?.detail) {

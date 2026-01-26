@@ -10,6 +10,7 @@ class User(Base):
     phone_number = Column(String, unique=True, index=True, nullable=False)
     full_name = Column(String, nullable=False)
     hashed_password = Column(String, nullable=False)
+    role = Column(String, default="USER", nullable=False) # "USER" or "ADMIN"
     created_at = Column(DateTime, default=datetime.utcnow)
     is_active = Column(Boolean, default=True)
     

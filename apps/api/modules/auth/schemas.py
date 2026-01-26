@@ -45,10 +45,18 @@ class TokenResponse(BaseModel):
     token_type: str = "bearer"
     user: "UserResponse"
 
+class UserProfileUpdate(BaseModel):
+    full_name: Optional[str] = Field(None, min_length=1, max_length=100)
+    
+class PasswordChange(BaseModel):
+    current_password: str
+    new_password: str = Field(..., min_length=6, description="New password with at least 6 characters")
+
 class UserResponse(BaseModel):
     id: str
     phone_number: str
     full_name: str
+    role: str
     created_at: datetime
     is_active: bool
     

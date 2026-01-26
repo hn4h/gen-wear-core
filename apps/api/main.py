@@ -4,18 +4,23 @@ from celery import Celery
 import os
 from apps.api.modules.generation.router import router as generation_router
 from apps.api.modules.auth.router import router as auth_router
+from apps.api.modules.products.router import router as product_router
+from apps.api.modules.products.router import (
+    category_router, collection_router, tag_router
+)
+from apps.api.modules.admin.router import router as admin_router
 from apps.api.modules.auth.database import init_db
 
 app = FastAPI(title="Gen Wear API")
 
 # CORS Config
-origins = [
-    "http://localhost:3000",
-]
+# origins = [
+#     "http://localhost:3000",
+# ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -40,4 +45,9 @@ def health_check():
 
 app.include_router(generation_router, prefix="/api/generation", tags=["generation"])
 app.include_router(auth_router, prefix="/api/auth", tags=["auth"])
+app.include_router(product_router, prefix="/api/products", tags=["products"])
+app.include_router(category_router, prefix="/api/categories", tags=["categories"])
+app.include_router(collection_router, prefix="/api/collections", tags=["collections"])
+app.include_router(tag_router, prefix="/api/tags", tags=["tags"])
+app.include_router(admin_router, prefix="/api/admin", tags=["admin"])
 
