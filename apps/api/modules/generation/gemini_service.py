@@ -15,7 +15,7 @@ def enhance_prompt(user_input: str) -> str:
         sys_instruct = "You are an expert AI Art Prompt Engineer. Convert user description into a detailed Stable Diffusion prompt. Return ONLY the prompt."
         
         response = client.models.generate_content(
-            model="gemini-1.5-flash",
+            model="gemini-2.5-flash",
             contents=user_input,
             config=types.GenerateContentConfig(
                 system_instruction=sys_instruct,

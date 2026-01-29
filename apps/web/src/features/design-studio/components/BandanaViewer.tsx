@@ -1,17 +1,23 @@
-import { useRef, Suspense, useEffect } from "react";
-import { Canvas, useFrame, useLoader } from "@react-three/fiber";
-import { OrbitControls, Center, Environment } from "@react-three/drei";
+import { useRef, Suspense, useEffect, Component, ReactNode } from "react";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { OrbitControls, Center, Environment, useTexture } from "@react-three/drei";
 import * as THREE from "three";
+
+class ErrorBoundary extends Component<{ children: ReactNode, fallback?: ReactNode }, { hasError: boolean }> {
+    state = { hasError: false };
+    static getDerivedStateFromError() { return { hasError: true }; }
+    componentDidCatch(error: any) { console.error("BandanaViewer error:", error); }
+    render() {
+        if (this.state.hasError) return this.props.fallback || null;
+        return this.props.children;
+    }
+}
 
 function BandanaMesh({ textureUrl }: { textureUrl?: string }) {
     const meshRef = useRef<THREE.Mesh>(null);
-
-    const url = textureUrl || "https://placehold.co/1024x1024/ef4444/ffffff/png?text=Gen+Wear";
-
-    // Use explicit loader to handle CORS
-    const texture = useLoader(THREE.TextureLoader, url, (loader) => {
-        loader.setCrossOrigin("anonymous");
-    });
+    // Use textureUrl if available, otherwise fallback to placeholder
+    const texturePath = textureUrl || '/textures/bandana_placeholder.png';
+    const texture = useTexture(texturePath);
 
     // Configure texture
     useEffect(() => {
@@ -34,8 +40,7 @@ function BandanaMesh({ textureUrl }: { textureUrl?: string }) {
         <mesh ref={meshRef} rotation={[-Math.PI / 2, 0, 0]}>
             <planeGeometry args={[4, 4]} />
             <meshStandardMaterial
-                map={textureUrl ? texture : undefined}
-                color={!textureUrl ? "#ef4444" : undefined}
+                map={texture}
                 side={THREE.DoubleSide}
             />
         </mesh>
@@ -51,7 +56,9 @@ export function BandanaViewer({ textureUrl }: { textureUrl?: string }) {
                 <OrbitControls makeDefault minPolarAngle={0} maxPolarAngle={Math.PI / 1.5} />
                 <Center>
                     <Suspense fallback={null}>
-                        <BandanaMesh key={textureUrl} textureUrl={textureUrl} />
+                        <ErrorBoundary fallback={<mesh rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[4, 4]} /><meshStandardMaterial color="#ef4444" /></mesh>}>
+                            <BandanaMesh key={textureUrl} textureUrl={textureUrl} />
+                        </ErrorBoundary>
                     </Suspense>
                 </Center>
                 <Environment preset="city" />

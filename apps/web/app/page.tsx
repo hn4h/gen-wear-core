@@ -9,7 +9,7 @@ const BandanaViewer = dynamic(
 );
 
 export default function Home() {
-    const { prompt, setPrompt, isLoading, textureUrl, generatePattern } = useDesignGeneration();
+    const { prompt, setPrompt, generatedPrompt, isLoading, textureUrl, generatePattern } = useDesignGeneration();
 
     return (
         <main className="flex min-h-screen flex-col items-center justify-between p-24">
@@ -31,6 +31,15 @@ export default function Home() {
                     isLoading={isLoading}
                 />
             </div>
+
+
+
+            {generatedPrompt && (
+                <div className="w-full max-w-5xl mt-6 p-6 bg-white dark:bg-slate-900 rounded-lg border shadow-sm">
+                    <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">Refined Prompt</h3>
+                    <p className="text-gray-700 dark:text-gray-300 leading-relaxed font-mono text-sm">{generatedPrompt}</p>
+                </div>
+            )}
 
             <div className="mt-8 text-center text-sm text-gray-500">
                 <p>Use your mouse to rotate the view. Scroll to zoom.</p>
