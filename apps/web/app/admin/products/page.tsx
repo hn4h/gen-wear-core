@@ -22,6 +22,10 @@ export default function AdminProductsPage() {
     const [isEditing, setIsEditing] = useState(false);
     const [editingProduct, setEditingProduct] = useState<Product | undefined>(undefined);
     
+    // Notifications
+    const [error, setError] = useState<string | null>(null);
+    const [success, setSuccess] = useState<string | null>(null);
+    
     // Filters
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('');
@@ -30,6 +34,7 @@ export default function AdminProductsPage() {
 
     const fetchData = async () => {
         setIsLoading(true);
+        setError(null);
         try {
             // Fetch metadata if needed
             if (categories.length === 0) {
@@ -51,8 +56,9 @@ export default function AdminProductsPage() {
             });
             setProducts(data.products);
             setTotalPages(data.total_pages);
-        } catch (error) {
+        } catch (error: any) {
             console.error('Failed to fetch data:', error);
+            setError(error.response?.data?.detail || 'Failed to load products');
         } finally {
             setIsLoading(false);
         }
@@ -65,17 +71,29 @@ export default function AdminProductsPage() {
         return () => clearTimeout(timer);
     }, [page, searchTerm, selectedCategory]);
 
+    useEffect(() => {
+        if (success) {
+            const timer = setTimeout(() => setSuccess(null), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [success]);
+
     const handleSave = async (data: any) => {
         try {
+            setError(null);
             if (editingProduct) {
                 await adminProductsAPI.updateProduct(editingProduct.id, data);
+                setSuccess('Product updated successfully');
             } else {
                 await adminProductsAPI.createProduct(data);
+                setSuccess('Product created successfully');
             }
             setIsEditing(false);
             setEditingProduct(undefined);
             fetchData();
-        } catch (error) {
+        } catch (error: any) {
+            console.error('Failed to save:', error);
+            setError(error.response?.data?.detail || 'Failed to save product');
             throw error;
         }
     };
@@ -83,11 +101,13 @@ export default function AdminProductsPage() {
     const handleDelete = async (id: string) => {
         if (confirm('Are you sure you want to delete this product?')) {
             try {
+                setError(null);
                 await adminProductsAPI.deleteProduct(id);
+                setSuccess('Product deleted successfully');
                 fetchData();
-            } catch (error) {
+            } catch (error: any) {
                 console.error('Failed to delete:', error);
-                alert('Failed to delete product');
+                setError(error.response?.data?.detail || 'Failed to delete product');
             }
         }
     };
@@ -100,12 +120,20 @@ export default function AdminProductsPage() {
                         onClick={() => {
                             setIsEditing(false);
                             setEditingProduct(undefined);
+                            setError(null);
                         }}
                         className="text-slate-400 hover:text-white"
                     >
                         &larr; Back to Products
                     </button>
                 </div>
+                
+                {error && (
+                    <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-500 rounded-xl">
+                        {error}
+                    </div>
+                )}
+
                 <ProductForm
                     initialData={editingProduct}
                     categories={categories}
@@ -115,6 +143,7 @@ export default function AdminProductsPage() {
                     onCancel={() => {
                         setIsEditing(false);
                         setEditingProduct(undefined);
+                        setError(null);
                     }}
                 />
             </div>
@@ -123,6 +152,31 @@ export default function AdminProductsPage() {
 
     return (
         <div>
+            {/* Notifications */}
+            {error && (
+                <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-500 rounded-xl flex justify-between items-center">
+                    <span>{error}</span>
+                    <button onClick={() => setError(null)} className="text-red-400 hover:text-red-300">
+                        <span className="sr-only">Dismiss</span>
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            )}
+            
+            {success && (
+                <div className="mb-6 p-4 bg-green-500/10 border border-green-500/20 text-green-500 rounded-xl flex justify-between items-center animate-fade-in-down">
+                    <span>{success}</span>
+                    <button onClick={() => setSuccess(null)} className="text-green-400 hover:text-green-300">
+                        <span className="sr-only">Dismiss</span>
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            )}
+
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                 <div>
                     <h1 className="text-3xl font-bold text-white mb-2">Product Management</h1>
@@ -133,6 +187,7 @@ export default function AdminProductsPage() {
                     onClick={() => {
                         setEditingProduct(undefined);
                         setIsEditing(true);
+                        setError(null);
                     }}
                     className="px-6 py-2 bg-purple-600 text-white rounded-xl hover:bg-purple-500 transition-colors flex items-center gap-2"
                 >

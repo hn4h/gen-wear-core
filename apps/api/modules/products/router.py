@@ -42,7 +42,11 @@ async def list_products(
         page=page,
         page_size=page_size
     )
-    return ProductService.list_products(db, filters)
+    try:
+        return ProductService.list_products(db, filters)
+    except Exception as e:
+        print(f"Error listing products: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("", response_model=ProductResponse, status_code=status.HTTP_201_CREATED)
 async def create_product(
@@ -137,6 +141,8 @@ async def update_category(
         )
     return category
 
+from sqlalchemy.exc import IntegrityError
+
 @category_router.delete("/{category_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_category(
     category_id: str,
@@ -149,6 +155,11 @@ async def delete_category(
             raise HTTPException(status_code=404, detail="Category not found")
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    except IntegrityError as e:
+        raise HTTPException(status_code=400, detail=f"Cannot delete: {str(e.orig)}")
+    except Exception as e:
+        print(f"Delete category error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 # Collection Endpoints
 collection_router = APIRouter()
@@ -195,6 +206,11 @@ async def delete_collection(
             raise HTTPException(status_code=404, detail="Collection not found")
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    except IntegrityError as e:
+        raise HTTPException(status_code=400, detail=f"Cannot delete: {str(e.orig)}")
+    except Exception as e:
+        print(f"Delete collection error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 # Tag Endpoints
 tag_router = APIRouter()
@@ -241,3 +257,8 @@ async def delete_tag(
             raise HTTPException(status_code=404, detail="Tag not found")
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    except IntegrityError as e:
+        raise HTTPException(status_code=400, detail=f"Cannot delete: {str(e.orig)}")
+    except Exception as e:
+        print(f"Delete tag error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))

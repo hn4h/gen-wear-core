@@ -101,7 +101,12 @@ class ProductService:
         total = query.count()
         
         # Apply sorting
-        sort_column = getattr(Product, filters.sort_by, Product.created_at)
+        # Apply sorting
+        if filters.sort_by:
+            sort_column = getattr(Product, filters.sort_by, Product.created_at)
+        else:
+            sort_column = Product.created_at
+
         if filters.sort_order == "desc":
             query = query.order_by(desc(sort_column))
         else:

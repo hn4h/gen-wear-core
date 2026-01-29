@@ -75,6 +75,10 @@ function ManageSection({
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [deletingItem, setDeletingItem] = useState<{id: string, name: string} | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [success, setSuccess] = useState<string | null>(null);
 
     const loadItems = async () => {
         try {
@@ -82,6 +86,7 @@ function ManageSection({
             setItems(data);
         } catch (e) {
             console.error(e);
+            setError('Failed to load items');
         } finally {
             setIsLoading(false);
         }
@@ -91,10 +96,18 @@ function ManageSection({
         loadItems();
     }, [fetcher]);
 
+    useEffect(() => {
+        if (success) {
+            const timer = setTimeout(() => setSuccess(null), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [success]);
+
     const openCreateModal = () => {
         setEditingItem(null);
         setName('');
         setDescription('');
+        setError(null);
         setShowModal(true);
     };
 
@@ -102,16 +115,18 @@ function ManageSection({
         setEditingItem(item);
         setName(item.name);
         setDescription(item.description || '');
+        setError(null);
         setShowModal(true);
     };
 
     const handleSubmit = async () => {
         if (!name.trim()) {
-            alert('Name is required');
+            setError('Name is required');
             return;
         }
 
         setIsSubmitting(true);
+        setError(null);
         try {
             if (editingItem) {
                 await updater(editingItem.id, name, hasDescription ? description : undefined);
@@ -123,32 +138,50 @@ function ManageSection({
             setDescription('');
             setEditingItem(null);
             setShowModal(false);
+            setSuccess(editingItem ? 'Item updated successfully' : 'Item created successfully');
             loadItems();
         } catch (error: any) {
             console.error('Submit error:', error);
-            alert(error.response?.data?.detail || 'Failed to submit');
+            setError(error.response?.data?.detail || 'Failed to submit');
         } finally {
             setIsSubmitting(false);
         }
     };
 
-    const handleDelete = async (id: string, itemName: string) => {
-        if (!confirm(`Are you sure you want to delete "${itemName}"?`)) {
-            return;
-        }
+    const handleDeleteClick = (id: string, itemName: string) => {
+        setDeletingItem({ id, name: itemName });
+        setError(null);
+    };
 
+    const executeDelete = async () => {
+        if (!deletingItem) return;
+
+        setIsDeleting(true);
+        setError(null);
         try {
-            await deleter(id);
+            await deleter(deletingItem.id);
+            setSuccess(`"${deletingItem.name}" deleted successfully`);
+            setDeletingItem(null);
             loadItems();
         } catch (error: any) {
             console.error('Delete error:', error);
-            alert(error.response?.data?.detail || 'Failed to delete');
+            // Show error in the modal
+            setError(error.response?.data?.detail || 'Failed to delete. The item might be in use.');
+        } finally {
+            setIsDeleting(false);
         }
     };
 
     return (
         <>
-            <div className="bg-slate-800/50 border border-white/5 rounded-2xl p-6 h-[500px] flex flex-col">
+            <div className="bg-slate-800/50 border border-white/5 rounded-2xl p-6 h-[500px] flex flex-col relative">
+                {/* Success Message */}
+                {success && (
+                    <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 bg-green-500/90 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-lg animate-fade-in-down">
+                        {success}
+                    </div>
+                )}
+
                 <div className="flex items-center justify-between mb-4">
                     <h3 className="text-xl font-bold text-white">{title}</h3>
                     <button 
@@ -178,7 +211,7 @@ function ManageSection({
                                         <PencilIcon className="w-4 h-4 text-blue-400" />
                                     </button>
                                     <button
-                                        onClick={() => handleDelete(item.id, item.name)}
+                                        onClick={() => handleDeleteClick(item.id, item.name)}
                                         className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-red-500/20 rounded-lg transition-all"
                                     >
                                         <Trash2Icon className="w-4 h-4 text-red-400" />
@@ -193,21 +226,28 @@ function ManageSection({
                 </div>
             </div>
 
-            {/* Modal */}
+            {/* Edit/Create Modal */}
             {showModal && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-slate-800 rounded-2xl border border-white/10 p-6 w-full max-w-md">
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+                    <div className="bg-slate-800 rounded-2xl border border-white/10 p-6 w-full max-w-md shadow-xl">
                         <div className="flex items-center justify-between mb-6">
                             <h3 className="text-xl font-bold text-white">
                                 {editingItem ? 'Edit ' : 'Add '}{title.slice(0, -1)}
                             </h3>
                             <button 
                                 onClick={() => setShowModal(false)}
-                                className="p-2 hover:bg-white/10 rounded-lg text-slate-400"
+                                className="p-2 hover:bg-white/10 rounded-lg text-slate-400 transition-colors"
                             >
                                 <XIcon className="w-5 h-5" />
                             </button>
                         </div>
+
+                        {/* Error within modal */}
+                        {error && (
+                            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl text-sm">
+                                {error}
+                            </div>
+                        )}
 
                         <div className="space-y-4">
                             <div>
@@ -248,6 +288,61 @@ function ManageSection({
                                     {isSubmitting ? 'Saving...' : (editingItem ? 'Update' : 'Create')}
                                 </button>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Delete Confirmation Modal */}
+            {deletingItem && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+                    <div className="bg-slate-800 rounded-2xl border border-white/10 p-6 w-full max-w-md shadow-xl">
+                        <div className="flex items-center justify-between mb-6">
+                            <h3 className="text-xl font-bold text-white">Confirm Delete</h3>
+                            <button 
+                                onClick={() => setDeletingItem(null)}
+                                className="p-2 hover:bg-white/10 rounded-lg text-slate-400 transition-colors"
+                            >
+                                <XIcon className="w-5 h-5" />
+                            </button>
+                        </div>
+                        
+                        <div className="mb-8">
+                            <p className="text-slate-300">
+                                Are you sure you want to delete <span className="text-white font-semibold">"{deletingItem.name}"</span>?
+                                <br />
+                                <span className="text-sm text-red-400 mt-2 block">This action cannot be undone.</span>
+                            </p>
+                        </div>
+
+                        {/* Error within modal */}
+                        {error && (
+                            <div className="mb-6 p-3 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl text-sm">
+                                {error}
+                            </div>
+                        )}
+
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setDeletingItem(null)}
+                                className="flex-1 px-4 py-2.5 rounded-xl border border-white/10 text-white hover:bg-white/5 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={executeDelete}
+                                disabled={isDeleting}
+                                className="flex-1 px-4 py-2.5 rounded-xl bg-red-600 text-white hover:bg-red-500 transition-colors disabled:opacity-50 shadow-lg shadow-red-900/20"
+                            >
+                                {isDeleting ? (
+                                    <span className="flex items-center justify-center gap-2">
+                                        <Loader2Icon className="w-4 h-4 animate-spin" />
+                                        Deleting...
+                                    </span>
+                                ) : (
+                                    'Delete'
+                                )}
+                            </button>
                         </div>
                     </div>
                 </div>
