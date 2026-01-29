@@ -2,20 +2,23 @@
 
 import Link from 'next/link';
 import { useAuthStore } from '@/src/lib/useAuthStore';
-// Button import removed as we use standard elements
+import { useCartStore } from '@/src/lib/useCartStore';
 import { Menu, X, ShoppingBag } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { authAPI } from '@/src/services/auth';
 
 // Cast icons to any to avoid "LucideIcon is not a valid JSX element type" error
 const MenuIcon = Menu as any;
 const XIcon = X as any;
 const ShoppingBagIcon = ShoppingBag as any;
-import { useState, useEffect } from 'react';
-import { authAPI } from '@/src/services/auth';
 
 export function Header() {
   const { user, logout, setUser } = useAuthStore();
+  const { totalItems, setIsOpen } = useCartStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  
+  const cartItemCount = totalItems();
 
   // Check valid session on mount
   useEffect(() => {
@@ -80,10 +83,17 @@ export function Header() {
           <div className="hidden md:flex items-center gap-4">
             {user ? (
               <div className="flex items-center gap-4">
-                 <Link href="/cart" className="p-2 text-gray-300 hover:text-white transition-colors relative">
+                 <button 
+                    onClick={() => setIsOpen(true)}
+                    className="p-2 text-gray-300 hover:text-white transition-colors relative"
+                 >
                     <ShoppingBagIcon className="w-6 h-6" />
-                    <span className="absolute top-0 right-0 w-2 h-2 bg-pink-500 rounded-full"></span>
-                 </Link>
+                    {cartItemCount > 0 && (
+                        <span className="absolute -top-1 -right-1 w-5 h-5 bg-pink-500 rounded-full text-[10px] items-center justify-center flex font-bold text-white">
+                            {cartItemCount}
+                        </span>
+                    )}
+                 </button>
                 <div className="flex items-center gap-3 pl-4 border-l border-white/10">
                     <div className="text-right hidden lg:block">
                         <p className="text-sm font-medium text-white">{user.full_name}</p>
