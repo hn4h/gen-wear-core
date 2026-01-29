@@ -1,6 +1,6 @@
-import { useRef, Suspense, useEffect, Component, ReactNode } from "react";
+import { useRef, Suspense, useEffect, useState, Component, ReactNode } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Center, Environment, useTexture } from "@react-three/drei";
+import { OrbitControls, Center, Environment } from "@react-three/drei";
 import * as THREE from "three";
 
 class ErrorBoundary extends Component<{ children: ReactNode, fallback?: ReactNode }, { hasError: boolean }> {
@@ -15,19 +15,42 @@ class ErrorBoundary extends Component<{ children: ReactNode, fallback?: ReactNod
 
 function BandanaMesh({ textureUrl }: { textureUrl?: string }) {
     const meshRef = useRef<THREE.Mesh>(null);
-    // Use textureUrl if available, otherwise fallback to placeholder
-    const texturePath = textureUrl || '/textures/bandana_placeholder.png';
-    const texture = useTexture(texturePath);
+    const [texture, setTexture] = useState<THREE.Texture | null>(null);
 
-    // Configure texture
+    // Load texture manually to handle base64 data URIs
     useEffect(() => {
-        if (texture) {
-            texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-            texture.center.set(0.5, 0.5);
-            texture.colorSpace = THREE.SRGBColorSpace;
-            texture.needsUpdate = true;
-        }
-    }, [texture]);
+        const loader = new THREE.TextureLoader();
+        const texturePath = textureUrl || '/textures/bandana_placeholder.png';
+        
+        loader.load(
+            texturePath,
+            (loadedTexture) => {
+                // Configure texture
+                loadedTexture.wrapS = loadedTexture.wrapT = THREE.RepeatWrapping;
+                loadedTexture.center.set(0.5, 0.5);
+                loadedTexture.colorSpace = THREE.SRGBColorSpace;
+                loadedTexture.needsUpdate = true;
+                setTexture(loadedTexture);
+            },
+            undefined,
+            (error) => {
+                console.error("Failed to load texture:", error);
+                // Load fallback on error
+                loader.load('/textures/bandana_placeholder.png', (fallback) => {
+                    fallback.wrapS = fallback.wrapT = THREE.RepeatWrapping;
+                    fallback.colorSpace = THREE.SRGBColorSpace;
+                    setTexture(fallback);
+                });
+            }
+        );
+
+        // Cleanup
+        return () => {
+            if (texture) {
+                texture.dispose();
+            }
+        };
+    }, [textureUrl]);
 
     useFrame((state, delta) => {
         if (meshRef.current) {
@@ -42,6 +65,7 @@ function BandanaMesh({ textureUrl }: { textureUrl?: string }) {
             <meshStandardMaterial
                 map={texture}
                 side={THREE.DoubleSide}
+                color={texture ? undefined : "#666666"}
             />
         </mesh>
     );

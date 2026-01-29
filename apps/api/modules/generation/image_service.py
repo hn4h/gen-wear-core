@@ -33,10 +33,26 @@ def generate_image(prompt: str) -> str:
         image_bytes = response.generated_images[0].image.image_bytes
 
         # 4. Convert to Base64 String
-        # Standard base64 encoding (utf-8 string)
-        base64_str = base64.b64encode(image_bytes).decode('utf-8')
-        
-        return base64_str
+        # Check if image_bytes is already a base64 string (sometimes API returns string)
+        if isinstance(image_bytes, str):
+            # Already a string, might be base64 - return as-is
+            return image_bytes
+        elif isinstance(image_bytes, bytes):
+            # Check if it's already base64 encoded bytes (starts with typical b64 chars)
+            try:
+                # Try to decode as UTF-8 string first
+                decoded_str = image_bytes.decode('utf-8')
+                # If it decodes to a string and looks like base64, return it
+                if decoded_str.startswith('iVBOR') or decoded_str.startswith('/9j/'):
+                    return decoded_str
+            except UnicodeDecodeError:
+                pass
+            
+            # Raw image bytes - need to encode to base64
+            base64_str = base64.b64encode(image_bytes).decode('utf-8')
+            return base64_str
+        else:
+            raise ValueError(f"Unexpected image_bytes type: {type(image_bytes)}")
 
     except Exception as e:
         print(f"Error generating image with Imagen 4: {e}")
