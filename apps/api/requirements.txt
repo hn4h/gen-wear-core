@@ -6,8 +6,15 @@ python-multipart==0.0.9
 python-dotenv
 sqlalchemy==2.0.27
 asyncpg==0.29.0
+psycopg2-binary==2.9.9
 redis==5.0.1
 celery==5.3.6
 google-genai
 pillow
 requests
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+bcrypt==4.0.1
+phonenumbers==8.13.27
+python-dotenv==1.0.0
+
