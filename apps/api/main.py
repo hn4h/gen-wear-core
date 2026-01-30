@@ -51,3 +51,25 @@ app.include_router(collection_router, prefix="/api/collections", tags=["collecti
 app.include_router(tag_router, prefix="/api/tags", tags=["tags"])
 app.include_router(admin_router, prefix="/api/admin", tags=["admin"])
 
+from apps.api.modules.cart.router import router as cart_router
+from apps.api.modules.orders.router import router as orders_router
+
+app.include_router(cart_router, prefix="/api/cart", tags=["cart"])
+app.include_router(orders_router, prefix="/api/orders", tags=["orders"])
+
+
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request, exc):
+    print(f"Validation error: {exc.errors()}")
+    try:
+        body = await request.json()
+        print(f"Request body: {body}")
+    except:
+        pass
+    return JSONResponse(
+        status_code=422,
+        content={"detail": exc.errors()},
+    )

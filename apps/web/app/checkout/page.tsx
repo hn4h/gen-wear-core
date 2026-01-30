@@ -44,11 +44,7 @@ export default function CheckoutPage() {
                 address: formData.address,
                 city: formData.city,
                 payment_method: formData.paymentMethod,
-                items: items.map(item => ({
-                    product_id: item.id,
-                    quantity: item.quantity,
-                    price: item.price
-                }))
+                // Items handled by backend from Cart
             };
 
             await ordersAPI.createOrder(orderData);

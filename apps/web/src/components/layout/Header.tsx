@@ -14,11 +14,18 @@ const ShoppingBagIcon = ShoppingBag as any;
 
 export function Header() {
   const { user, logout, setUser } = useAuthStore();
-  const { totalItems, setIsOpen } = useCartStore();
+  const { totalItems, setIsOpen, fetchCart } = useCartStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   
   const cartItemCount = totalItems();
+
+  // Fetch cart when user is present
+  useEffect(() => {
+    if (user) {
+      fetchCart();
+    }
+  }, [user, fetchCart]);
 
   // Check valid session on mount
   useEffect(() => {
@@ -97,6 +104,14 @@ export function Header() {
                 <div className="flex items-center gap-3 pl-4 border-l border-white/10">
                     <div className="text-right hidden lg:block">
                         <p className="text-sm font-medium text-white">{user.full_name}</p>
+                        {user.role === 'ADMIN' && (
+                            <Link href="/admin" className="block text-xs text-pink-400 hover:text-pink-300 font-bold mb-1">
+                                Admin Dashboard
+                            </Link>
+                        )}
+                        <Link href="/orders" className="block text-xs text-slate-300 hover:text-white mb-1">
+                            Lịch sử đơn hàng
+                        </Link>
                         <button 
                             onClick={() => logout()}
                             className="text-xs text-purple-400 hover:text-purple-300"
@@ -160,6 +175,11 @@ export function Header() {
                         <div>
                             <p className="font-medium text-white">{user.full_name}</p>
                             <p className="text-sm text-gray-400">{user.phone_number}</p>
+                            {user.role === 'ADMIN' && (
+                                <Link href="/admin" className="block text-sm text-pink-400 font-bold mt-1">
+                                    Admin Dashboard
+                                </Link>
+                            )}
                         </div>
                     </div>
                     <button 
