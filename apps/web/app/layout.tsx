@@ -19,11 +19,16 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
+<<<<<<< HEAD
         <html lang="en">
             <body className={inter.className}>
                 {children}
                 <CartSheet />
             </body>
+=======
+        <html lang="en" suppressHydrationWarning>
+            <body className={inter.className} suppressHydrationWarning>{children}</body>
+>>>>>>> main
         </html>
     );
 }

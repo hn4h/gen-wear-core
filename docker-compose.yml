@@ -1,6 +1,7 @@
 version: "3.8"
 
 services:
+  # FRONTEND - Next.js
   web:
     build:
       context: .
@@ -8,18 +9,18 @@ services:
     ports:
       - "3000:3000"
     environment:
+      # URL trình duyệt gọi API (Client Side)
       - NEXT_PUBLIC_API_URL=http://localhost:8000
     depends_on:
-      api:
-        condition: service_started
+      - api
     volumes:
       - ./apps/web:/app/apps/web
-      # Avoid overwriting node_modules in the container with local empty dir
       - /app/apps/web/node_modules
       - /app/apps/web/.next
-    # Ensure it keeps running
+    # Chạy chế độ Dev (Hot Reload)
     command: npm run dev --workspace=apps/web
 
+  # BACKEND - FastAPI + Gemini
   api:
     build:
       context: .
@@ -27,8 +28,8 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - GEMINI_API_KEY=${GEMINI_API_KEY}9
-      - DATABASE_URL=postgresql+psycopg2://user:password@postgres:5432/genwear
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - DATABASE_URL=postgresql://genwear:password@postgres:5432/genwear_db
       - REDIS_URL=redis://redis:6379
     depends_on:
       postgres:
@@ -37,46 +38,45 @@ services:
         condition: service_healthy
     volumes:
       - ./apps/api:/app/apps/api
-    # Health check to ensure API is ready before web might confuse it (optional, but good practice)
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    # QUAN TRỌNG: --reload để sửa code thấy ngay, host 0.0.0.0 để docker hiểu
+    command: uvicorn apps.api.main:app --host 0.0.0.0 --port 8000 --reload
 
+  # WORKER - Celery (Xử lý hàng đợi Gemini nếu cần)
   ai-worker:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
+    # Đảm bảo đường dẫn module apps.api.main đúng với cấu trúc file của anh
     command: celery -A apps.api.main.celery_app worker --loglevel=info
     environment:
-      - DATABASE_URL=postgresql+psycopg2://user:password@postgres:5432/genwear
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - DATABASE_URL=postgresql://genwear:password@postgres:5432/genwear_db
       - REDIS_URL=redis://redis:6379
     depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+      - api
+      - redis
     volumes:
       - ./apps/api:/app/apps/api
 
+  # DATABASE - PostgreSQL
   postgres:
     image: postgres:15-alpine
     restart: always
     environment:
-      - POSTGRES_USER=user
+      - POSTGRES_USER=genwear
       - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=genwear
+      - POSTGRES_DB=genwear_db
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U user -d genwear"]
-      interval: 10s
+      test: ["CMD-SHELL", "pg_isready -U genwear -d genwear_db"]
+      interval: 5s
       timeout: 5s
       retries: 5
 
+  # CACHE/QUEUE - Redis
   redis:
     image: redis:alpine
     restart: always
@@ -86,7 +86,7 @@ services:
       - redis_data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
+      interval: 5s
       timeout: 5s
       retries: 5
 
