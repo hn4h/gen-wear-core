@@ -8,7 +8,8 @@ import {
     Tags, 
     LogOut,
     Menu,
-    X
+    X,
+    ClipboardList
 } from 'lucide-react';
 import { useAuthStore } from '@/src/lib/useAuthStore';
 import { useState } from 'react';
@@ -22,6 +23,7 @@ const TagsIcon = Tags as any;
 const LogOutIcon = LogOut as any;
 const MenuIcon = Menu as any;
 const XIcon = X as any;
+const ClipboardListIcon = ClipboardList as any;
 
 export function AdminSidebar() {
     const pathname = usePathname();
@@ -30,6 +32,7 @@ export function AdminSidebar() {
 
     const routes = [
         { href: '/admin', label: 'Overview', icon: LayoutDashboardIcon },
+        { href: '/admin/orders', label: 'Orders', icon: ClipboardListIcon },
         { href: '/admin/users', label: 'Users', icon: UsersIcon },
         { href: '/admin/products', label: 'Products', icon: ShoppingBagIcon },
         { href: '/admin/categories', label: 'Categories', icon: LayersIcon },

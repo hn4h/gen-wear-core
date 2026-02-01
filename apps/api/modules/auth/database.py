@@ -26,4 +26,8 @@ def get_db():
 # Initialize database tables
 def init_db():
     from apps.api.modules.auth.models import User
+    from apps.api.modules.cart.models import Cart, CartItem
+    from apps.api.modules.orders.models import Order, OrderItem
+    from apps.api.modules.products.models import Product
     Base.metadata.create_all(bind=engine)
+

@@ -1,6 +1,7 @@
 import { Product } from '@/src/services/products';
 import { ShoppingBag, Star } from 'lucide-react';
 import Link from 'next/link';
+import { useCartStore } from '@/src/lib/useCartStore';
 
 // Cast icons to any to avoid type errors
 const ShoppingBagIcon = ShoppingBag as any;
@@ -11,6 +12,8 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+    const { addItem } = useCartStore();
+
     return (
         <div className="group bg-slate-800/50 rounded-2xl overflow-hidden border border-white/5 hover:border-purple-500/30 transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/10">
             {/* Image Container */}
@@ -29,12 +32,18 @@ export function ProductCard({ product }: ProductCardProps) {
                 
                 {/* Overlay Actions */}
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-2">
-                    <button className="p-3 bg-white text-slate-900 rounded-full hover:bg-purple-50 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+                    <button 
+                        onClick={(e) => {
+                            e.preventDefault();
+                            addItem(product);
+                        }}
+                        className="p-3 bg-white text-slate-900 rounded-full hover:bg-purple-50 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 hover:scale-110 active:scale-95"
+                    >
                         <ShoppingBagIcon className="w-5 h-5" />
                     </button>
                     <Link 
                         href={`/products/${product.id}`}
-                        className="p-3 bg-white text-slate-900 rounded-full hover:bg-purple-50 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 delay-75"
+                        className="p-3 bg-white text-slate-900 rounded-full hover:bg-purple-50 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 delay-75 hover:scale-110 active:scale-95"
                     >
                         View
                     </Link>

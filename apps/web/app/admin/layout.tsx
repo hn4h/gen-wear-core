@@ -13,12 +13,12 @@ export default function AdminLayout({
 }: {
     children: React.ReactNode;
 }) {
-    const { user, isLoading: isAuthLoading } = useAuthStore();
+    const { user, hasHydrated } = useAuthStore();
     const router = useRouter();
     const [isAuthorized, setIsAuthorized] = useState(false);
 
     useEffect(() => {
-        if (!isAuthLoading) {
+        if (hasHydrated) {
             if (!user) {
                 router.push('/login');
             } else if (user.role !== 'ADMIN') {
@@ -27,9 +27,9 @@ export default function AdminLayout({
                 setIsAuthorized(true);
             }
         }
-    }, [user, isAuthLoading, router]);
+    }, [user, hasHydrated, router]);
 
-    if (isAuthLoading || !isAuthorized) {
+    if (!hasHydrated || !isAuthorized) {
         return (
             <div className="min-h-screen bg-slate-900 flex items-center justify-center">
                 <Loader2Icon className="w-8 h-8 text-purple-600 animate-spin" />
