@@ -10,7 +10,7 @@ services:
       - "3000:3000"
     environment:
       # URL trình duyệt gọi API (Client Side)
-      - NEXT_PUBLIC_API_URL=http://localhost:8000
+      - NEXT_PUBLIC_API_URL=https://api.genwear.io.vn
     depends_on:
       - api
     volumes:

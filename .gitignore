@@ -65,5 +65,3 @@ env/
 
 # Turborepo
 .turbo/
-__pycache__/
-*.pyc
