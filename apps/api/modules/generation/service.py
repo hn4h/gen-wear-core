@@ -3,9 +3,11 @@ from .image_service import generate_image
 
 def generate_pattern_service(prompt: str):
     # 1. Enhance the prompt using Gemini 1.5 Flash
-    optimized_prompt = enhance_prompt(prompt)
+    # MOCK MODE: Skip enhancement to avoid API calls
+    # optimized_prompt = enhance_prompt(prompt)
+    optimized_prompt = prompt 
     print(f"Original: [{prompt}]")
-    print(f"Optimized: [{optimized_prompt}]")
+    print(f"Optimized (MOCK): [{optimized_prompt}]")
     
     # 2. Generate image using Imagen 3
     # generate_image returns a raw base64 string
@@ -17,4 +19,3 @@ def generate_pattern_service(prompt: str):
         "url": f"data:image/png;base64,{base64_image}",
         "prompt": optimized_prompt
     }
-
