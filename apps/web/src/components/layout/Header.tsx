@@ -109,6 +109,9 @@ export function Header() {
                                 Admin Dashboard
                             </Link>
                         )}
+                        <Link href="/designs" className="block text-xs text-slate-300 hover:text-white mb-1">
+                            Thiết kế của tôi
+                        </Link>
                         <Link href="/orders" className="block text-xs text-slate-300 hover:text-white mb-1">
                             Lịch sử đơn hàng
                         </Link>
@@ -180,6 +183,12 @@ export function Header() {
                                     Admin Dashboard
                                 </Link>
                             )}
+                            <Link href="/designs" className="block text-sm text-gray-300 hover:text-white mt-1">
+                                Thiết kế của tôi
+                            </Link>
+                            <Link href="/orders" className="block text-sm text-gray-300 hover:text-white mt-1">
+                                Lịch sử đơn hàng
+                            </Link>
                         </div>
                     </div>
                     <button 

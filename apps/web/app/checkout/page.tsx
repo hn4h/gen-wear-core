@@ -18,7 +18,7 @@ const ShoppingCartIcon = ShoppingCart as any;
 const MinusIcon = Minus as any;
 const PlusIcon = Plus as any;
 
-const DESIGN_PRICE = 299000;
+const DESIGN_PRICE = 150000;
 
 export default function CheckoutPage() {
     const searchParams = useSearchParams();

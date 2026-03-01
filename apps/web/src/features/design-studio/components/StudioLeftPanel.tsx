@@ -9,6 +9,8 @@ const SparklesIcon = Sparkles as any;
 const Wand2Icon = Wand2 as any;
 const EyeIcon = Eye as any;
 const ShoppingCartIcon = ShoppingCart as any;
+import { Save } from "lucide-react";
+const SaveIcon = Save as any;
 
 interface StudioLeftPanelProps {
     // Generation
@@ -31,6 +33,9 @@ interface StudioLeftPanelProps {
     onComplete: () => void;
     // Order Design
     onOrderDesign: () => void;
+    // Save Design
+    onSaveDesign: () => void;
+    isSaving?: boolean;
 }
 
 const STYLE_OPTIONS = [
@@ -60,6 +65,8 @@ export function StudioLeftPanel({
     hasImage,
     onComplete,
     onOrderDesign,
+    onSaveDesign,
+    isSaving = false,
 }: StudioLeftPanelProps) {
     const canGenerate = designPrompt.trim().length > 0 && !isGenerating;
     const canApplyEdit = hasImage && hasMask && editPrompt.trim().length > 0 && !isApplying;
@@ -236,6 +243,26 @@ export function StudioLeftPanel({
                                 <ShoppingCartIcon className="w-5 h-5" />
                                 Đặt hàng thiết kế này
                             </button>
+
+                            {/* Save Design Button */}
+                            <button
+                                onClick={onSaveDesign}
+                                disabled={isSaving}
+                                className="w-full py-3 px-6 rounded-xl border border-white/10 text-white font-semibold hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2"
+                            >
+                                {isSaving ? (
+                                    <>
+                                        <Loader2Icon className="w-5 h-5 animate-spin" />
+                                        Đang lưu...
+                                    </>
+                                ) : (
+                                    <>
+                                        <SaveIcon className="w-5 h-5" />
+                                        Lưu thiết kế
+                                    </>
+                                )}
+                            </button>
+
                             <p className="text-xs text-gray-500 text-center">
                                 Đặt khăn in với thiết kế AI của bạn
                             </p>

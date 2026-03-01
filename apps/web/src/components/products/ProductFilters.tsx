@@ -165,7 +165,7 @@ export function ProductFilters({
                     <input
                         type="range"
                         min="0"
-                        max="1000"
+                        max="1000000"
                         value={priceRange[1]}
                         onChange={(e) => onPriceRangeChange([priceRange[0], parseInt(e.target.value)])}
                         className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-purple-500"

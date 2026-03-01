@@ -29,5 +29,6 @@ def init_db():
     from apps.api.modules.cart.models import Cart, CartItem
     from apps.api.modules.orders.models import Order, OrderItem
     from apps.api.modules.products.models import Product
+    from apps.api.modules.designs.models import SavedDesign
     Base.metadata.create_all(bind=engine)
 
