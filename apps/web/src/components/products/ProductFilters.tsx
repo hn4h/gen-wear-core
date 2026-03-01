@@ -159,8 +159,8 @@ export function ProductFilters({
                 <h3 className="text-white font-semibold mb-4">Price Range</h3>
                 <div className="space-y-4 px-2">
                     <div className="flex items-center justify-between text-sm text-slate-400">
-                        <span>${priceRange[0]}</span>
-                        <span>${priceRange[1]}</span>
+                        <span>{priceRange[0].toLocaleString('vi-VN')}₫</span>
+                        <span>{priceRange[1].toLocaleString('vi-VN')}₫</span>
                     </div>
                     <input
                         type="range"

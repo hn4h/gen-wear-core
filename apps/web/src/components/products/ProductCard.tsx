@@ -70,7 +70,7 @@ export function ProductCard({ product }: ProductCardProps) {
                     <div className="flex flex-col">
                         <span className="text-slate-500 text-xs uppercase tracking-wider">Price</span>
                         <span className="text-xl font-bold text-white">
-                            ${product.price.toLocaleString()}
+                            {product.price.toLocaleString('vi-VN')}₫
                         </span>
                     </div>
                     

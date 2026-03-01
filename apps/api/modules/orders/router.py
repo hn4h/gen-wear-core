@@ -107,7 +107,7 @@ async def create_order(
 ):
     # --- Custom AI Design Order ---
     if order_data.custom_design_url:
-        price = order_data.custom_design_price or 299000.0
+        price = order_data.custom_design_price or 150000.0
         quantity = order_data.custom_design_quantity or 1
         total_amount = price * quantity
         

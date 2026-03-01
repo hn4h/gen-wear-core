@@ -2,7 +2,7 @@ import axios from 'axios';
 import { User } from '@/src/lib/useAuthStore';
 import { getAuthToken } from '@/src/lib/useAuthStore';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 export interface UserListResponse {
     users: User[];
@@ -15,7 +15,7 @@ export interface UserListResponse {
 export const adminAPI = {
     getUsers: async (page = 1, pageSize = 20, search = '') => {
         const token = getAuthToken();
-        const response = await axios.get<UserListResponse>(`${API_URL}/admin/users`, {
+        const response = await axios.get<UserListResponse>(`${API_URL}/api/admin/users`, {
             params: { page, page_size: pageSize, search },
             headers: { Authorization: `Bearer ${token}` }
         });
@@ -24,7 +24,7 @@ export const adminAPI = {
 
     updateUserRole: async (userId: string, role: string) => {
         const token = getAuthToken();
-        const response = await axios.put<{role: string}>(`${API_URL}/admin/users/${userId}/role`, 
+        const response = await axios.put<{role: string}>(`${API_URL}/api/admin/users/${userId}/role`, 
             { role },
             { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -33,7 +33,7 @@ export const adminAPI = {
 
     deleteUser: async (userId: string) => {
         const token = getAuthToken();
-        await axios.delete(`${API_URL}/admin/users/${userId}`, {
+        await axios.delete(`${API_URL}/api/admin/users/${userId}`, {
             headers: { Authorization: `Bearer ${token}` }
         });
     }

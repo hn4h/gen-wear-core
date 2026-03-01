@@ -23,7 +23,7 @@ export default function ProductsPage() {
     const [selectedCategory, setSelectedCategory] = useState('');
     const [selectedCollection, setSelectedCollection] = useState('');
     const [selectedTag, setSelectedTag] = useState('');
-    const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
+    const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000000]);
     const [searchTerm, setSearchTerm] = useState('');
     const [sortBy, setSortBy] = useState('newest');
     const [page, setPage] = useState(1);

@@ -140,7 +140,7 @@ export default function AdminOrdersPage() {
                                             <p className="text-white font-medium text-sm">{order.full_name}</p>
                                             <p className="text-slate-400 text-xs">{new Date(order.created_at).toLocaleDateString()}</p>
                                         </div>
-                                        <p className="text-purple-400 font-bold">${order.total_amount.toLocaleString()}</p>
+                                        <p className="text-purple-400 font-bold">{order.total_amount.toLocaleString('vi-VN')}₫</p>
                                     </div>
                                 </div>
                             ))
@@ -273,15 +273,15 @@ export default function AdminOrdersPage() {
                                                         </div>
                                                     </td>
                                                     <td className="p-4 text-center">{item.quantity}</td>
-                                                    <td className="p-4 text-right">${item.price.toLocaleString()}</td>
-                                                    <td className="p-4 text-right text-purple-400 font-bold">${(item.quantity * item.price).toLocaleString()}</td>
+                                                    <td className="p-4 text-right">{item.price.toLocaleString('vi-VN')}₫</td>
+                                                    <td className="p-4 text-right text-purple-400 font-bold">{(item.quantity * item.price).toLocaleString('vi-VN')}₫</td>
                                                 </tr>
                                             ))}
                                         </tbody>
                                         <tfoot className="bg-slate-800/50 font-bold text-white">
                                             <tr>
                                                 <td colSpan={3} className="p-4 text-right">Total Amount</td>
-                                                <td className="p-4 text-right text-lg">${selectedOrder.total_amount.toLocaleString()}</td>
+                                                <td className="p-4 text-right text-lg">{selectedOrder.total_amount.toLocaleString('vi-VN')}₫</td>
                                             </tr>
                                         </tfoot>
                                     </table>
