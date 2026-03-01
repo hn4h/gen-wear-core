@@ -1,14 +1,18 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { StudioLeftPanel } from "./StudioLeftPanel";
 import { StudioCanvas } from "./StudioCanvas";
 import { Preview3DModal } from "./Preview3DModal";
 import { useDesignGeneration } from "../hooks/useDesignGeneration";
 import { useRegionEdit } from "../hooks/useRegionEdit";
 import { Header } from "@/src/components/layout/Header";
+import { useDesignOrderStore } from "@/src/lib/useDesignOrderStore";
 
 export function StudioLayout() {
+    const router = useRouter();
+    const { setDesign } = useDesignOrderStore();
     const [selectedStyle, setSelectedStyle] = useState("");
     const [show3DPreview, setShow3DPreview] = useState(false);
     const [maskBase64, setMaskBase64] = useState<string | null>(null);
@@ -79,6 +83,12 @@ export function StudioLayout() {
         setShow3DPreview(false);
     }, [displayedImage]);
 
+    const handleOrderDesign = useCallback(() => {
+        if (!displayedImage) return;
+        setDesign(displayedImage, designPrompt);
+        router.push('/checkout?type=design');
+    }, [displayedImage, designPrompt, setDesign, router]);
+
     return (
         <div className="min-h-screen bg-slate-900 flex flex-col">
             <Header />
@@ -102,6 +112,7 @@ export function StudioLayout() {
                     isApplying={isApplying}
                     hasImage={!!displayedImage}
                     onComplete={handleComplete}
+                    onOrderDesign={handleOrderDesign}
                 />
 
                 {/* Right Panel - Canvas */}

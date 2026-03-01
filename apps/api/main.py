@@ -11,7 +11,7 @@ from apps.api.modules.products.router import (
 from apps.api.modules.admin.router import router as admin_router
 from apps.api.modules.auth.database import init_db
 
-app = FastAPI(title="Gen Wear API")
+app = FastAPI(title="Gen Wear API", redirect_slashes=False)
 
 # CORS Config
 # origins = [
@@ -20,7 +20,12 @@ app = FastAPI(title="Gen Wear API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[ "https://genwear.io.vn","http://localhost:3000"],
+    allow_origins=[
+        "https://genwear.io.vn",
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "http://127.0.0.1:3000",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

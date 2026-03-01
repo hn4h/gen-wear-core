@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2, Sparkles, Wand2, Eye } from "lucide-react";
+import { Loader2, Sparkles, Wand2, Eye, ShoppingCart } from "lucide-react";
 import { RegionSelection } from "../hooks/useRegionEdit";
 
 // Cast icons to any to avoid type errors
@@ -8,6 +8,7 @@ const Loader2Icon = Loader2 as any;
 const SparklesIcon = Sparkles as any;
 const Wand2Icon = Wand2 as any;
 const EyeIcon = Eye as any;
+const ShoppingCartIcon = ShoppingCart as any;
 
 interface StudioLeftPanelProps {
     // Generation
@@ -28,6 +29,8 @@ interface StudioLeftPanelProps {
     hasImage: boolean;
     // Complete
     onComplete: () => void;
+    // Order Design
+    onOrderDesign: () => void;
 }
 
 const STYLE_OPTIONS = [
@@ -56,6 +59,7 @@ export function StudioLeftPanel({
     isApplying,
     hasImage,
     onComplete,
+    onOrderDesign,
 }: StudioLeftPanelProps) {
     const canGenerate = designPrompt.trim().length > 0 && !isGenerating;
     const canApplyEdit = hasImage && hasMask && editPrompt.trim().length > 0 && !isApplying;
@@ -215,7 +219,7 @@ export function StudioLeftPanel({
                         </div>
 
                         {/* Complete Section */}
-                        <div className="p-6">
+                        <div className="p-6 space-y-3">
                             <button
                                 onClick={onComplete}
                                 className="w-full py-3 px-6 rounded-xl border-2 border-emerald-500 text-emerald-400 font-semibold hover:bg-emerald-500/10 transition-all duration-200 flex items-center justify-center gap-2"
@@ -223,8 +227,17 @@ export function StudioLeftPanel({
                                 <EyeIcon className="w-5 h-5" />
                                 Xem trước 3D
                             </button>
-                            <p className="text-xs text-gray-500 text-center mt-2">
-                                Xem thiết kế của bạn trên mô hình 3D
+                            
+                            {/* Order Design Button */}
+                            <button
+                                onClick={onOrderDesign}
+                                className="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold hover:from-purple-700 hover:to-pink-700 transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-purple-500/25"
+                            >
+                                <ShoppingCartIcon className="w-5 h-5" />
+                                Đặt hàng thiết kế này
+                            </button>
+                            <p className="text-xs text-gray-500 text-center">
+                                Đặt khăn in với thiết kế AI của bạn
                             </p>
                         </div>
                     </>
