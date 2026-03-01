@@ -46,8 +46,14 @@ export function StudioLayout() {
 
     // Update current image when new design is generated
     const handleGenerate = useCallback(async () => {
+        const token = getAuthToken();
+        if (!token) {
+            alert("Vui lòng đăng nhập để sử dụng tính năng tạo thiết kế AI");
+            router.push("/login?redirect=/studio");
+            return;
+        }
         await generatePattern();
-    }, [generatePattern]);
+    }, [generatePattern, router]);
 
     // When textureUrl changes, update currentImageUrl
     const displayedImage = textureUrl || currentImageUrl;

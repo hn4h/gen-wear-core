@@ -2,13 +2,14 @@
 
 import { useCartStore } from '@/src/lib/useCartStore';
 import { useDesignOrderStore } from '@/src/lib/useDesignOrderStore';
+import { useAuthStore } from '@/src/lib/useAuthStore';
 import { Header } from '@/src/components/layout/Header';
 import { Footer } from '@/src/components/layout/Footer';
 import { useState, useEffect } from 'react';
 import { Loader2, CheckCircle2, Sparkles, ShoppingCart, Minus, Plus } from 'lucide-react';
 import { ordersAPI } from '@/src/services/orders';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 // Cast icons
 const Loader2Icon = Loader2 as any;
@@ -22,15 +23,22 @@ const DESIGN_PRICE = 150000;
 
 export default function CheckoutPage() {
     const searchParams = useSearchParams();
+    const router = useRouter();
     const isDesignOrder = searchParams.get('type') === 'design';
     
     const { items, totalPrice, clearCart } = useCartStore();
     const { designImageUrl, designPrompt, clearDesign } = useDesignOrderStore();
+    const { user } = useAuthStore();
     
     const [isProcessing, setIsProcessing] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
     const [designQuantity, setDesignQuantity] = useState(1);
+    const [mounted, setMounted] = useState(false);
     
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
     // Form State
     const [formData, setFormData] = useState({
         fullName: '',
@@ -48,10 +56,25 @@ export default function CheckoutPage() {
 
     // Redirect if design order but no design image
     useEffect(() => {
-        if (isDesignOrder && !designImageUrl) {
-            window.location.href = '/studio';
+        if (!mounted) return;
+        if (!user) {
+            alert('Vui lòng đăng nhập để tiếp tục thanh toán');
+            router.push(`/login?redirect=/checkout${isDesignOrder ? '?type=design' : ''}`);
+            return;
         }
-    }, [isDesignOrder, designImageUrl]);
+        if (isDesignOrder && !designImageUrl) {
+            router.push('/studio');
+        }
+    }, [isDesignOrder, designImageUrl, user, mounted, router]);
+
+    // Don't render until mounted and user is verified to avoid hydration mismatch
+    if (!mounted || !user) {
+        return (
+            <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+                <Loader2Icon className="w-8 h-8 animate-spin text-purple-500" />
+            </div>
+        );
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
