@@ -1,4 +1,7 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import { useAuthStore } from "@/src/lib/useAuthStore";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 interface GenResponse {
     url: string;
@@ -20,41 +23,62 @@ export function useDesignGeneration(): UseDesignGenerationReturn {
     const [isLoading, setIsLoading] = useState(false);
     const [textureUrl, setTextureUrl] = useState<string | undefined>();
 
-    const generatePattern = async () => {
-        if (!prompt) return;
+    const { token } = useAuthStore();
+
+    const generatePattern = useCallback(async () => {
+        if (!prompt) {
+            console.warn("[useDesignGeneration] No prompt, skipping.");
+            return;
+        }
+
+        if (!token) {
+            console.error("[useDesignGeneration] No auth token found");
+            return;
+        }
 
         setIsLoading(true);
-        // Clear previous results while loading
+        setTextureUrl(undefined);   // clear ảnh cũ để force re-render khi có ảnh mới
         setGeneratedPrompt("");
-        
+
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/generation`, {
+            console.log("[useDesignGeneration] Calling API:", `${API_URL}/api/generation`);
+            const response = await fetch(`${API_URL}/api/generation`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
                 body: JSON.stringify({ prompt }),
             });
 
+            console.log("[useDesignGeneration] Response status:", response.status);
+
             if (!response.ok) {
                 const errorText = await response.text();
-                // console.error("API Error:", response.status, errorText); // Removed console.error as per style guide preference if possible, but kept simple error handling.
-                // Keeping it simple as per original code structure but improving types.
-                 console.error("API Error:", response.status, errorText);
+                console.error("[useDesignGeneration] API Error:", response.status, errorText);
                 throw new Error(`API responded with status ${response.status}: ${errorText}`);
             }
 
             const data: GenResponse = await response.json();
+            console.log("[useDesignGeneration] data keys:", Object.keys(data));
+            console.log("[useDesignGeneration] data.url length:", data.url?.length ?? "undefined");
+
             if (data.url) {
+                console.log("[useDesignGeneration] Setting textureUrl, prefix:", data.url.slice(0, 30));
                 setTextureUrl(data.url);
+            } else {
+                console.warn("[useDesignGeneration] data.url is empty or missing:", data);
             }
+
             if (data.prompt) {
                 setGeneratedPrompt(data.prompt);
             }
         } catch (error) {
-            console.error("Failed to generate:", error);
+            console.error("[useDesignGeneration] Failed to generate:", error);
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [prompt, token]);
 
     return {
         prompt,

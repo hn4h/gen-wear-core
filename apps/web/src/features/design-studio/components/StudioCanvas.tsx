@@ -363,7 +363,6 @@ export function StudioCanvas({
                             alt="Generated design"
                             className="max-w-full max-h-[60vh] object-contain rounded-lg shadow-2xl"
                             onLoad={handleImageLoad}
-                            crossOrigin="anonymous"
                         />
                         {/* Visible drawing canvas */}
                         <canvas

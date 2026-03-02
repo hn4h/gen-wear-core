@@ -17,38 +17,53 @@ function BandanaMesh({ textureUrl }: { textureUrl?: string }) {
     const meshRef = useRef<THREE.Mesh>(null);
     const [texture, setTexture] = useState<THREE.Texture | null>(null);
 
-    // Load texture manually to handle base64 data URIs
+    // Load texture manually — handles both data URI (base64) and regular URLs.
+    // THREE.TextureLoader uses XHR internally which fails on data URIs in some browsers.
     useEffect(() => {
-        const loader = new THREE.TextureLoader();
-        const texturePath = textureUrl || '/textures/bandana_placeholder.png';
-        
-        loader.load(
-            texturePath,
-            (loadedTexture) => {
-                // Configure texture
-                loadedTexture.wrapS = loadedTexture.wrapT = THREE.RepeatWrapping;
-                loadedTexture.center.set(0.5, 0.5);
-                loadedTexture.colorSpace = THREE.SRGBColorSpace;
-                loadedTexture.needsUpdate = true;
-                setTexture(loadedTexture);
-            },
-            undefined,
-            (error) => {
-                console.error("Failed to load texture:", error);
-                // Load fallback on error
-                loader.load('/textures/bandana_placeholder.png', (fallback) => {
-                    fallback.wrapS = fallback.wrapT = THREE.RepeatWrapping;
-                    fallback.colorSpace = THREE.SRGBColorSpace;
-                    setTexture(fallback);
-                });
-            }
-        );
+        let disposed = false;
+        let currentTexture: THREE.Texture | null = null;
 
-        // Cleanup
-        return () => {
-            if (texture) {
-                texture.dispose();
+        const loadFromSrc = (src: string): Promise<THREE.Texture> => {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => {
+                    const tex = new THREE.Texture(img);
+                    tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+                    tex.colorSpace = THREE.SRGBColorSpace;
+                    tex.needsUpdate = true;
+                    resolve(tex);
+                };
+                img.onerror = reject;
+                img.src = src;
+            });
+        };
+
+        const run = async () => {
+            const src = textureUrl || '/textures/bandana_placeholder.png';
+            try {
+                const tex = await loadFromSrc(src);
+                if (!disposed) {
+                    currentTexture = tex;
+                    setTexture(tex);
+                }
+            } catch (err) {
+                console.error("Failed to load texture:", err);
+                // Fallback to placeholder
+                try {
+                    const fallback = await loadFromSrc('/textures/bandana_placeholder.png');
+                    if (!disposed) {
+                        currentTexture = fallback;
+                        setTexture(fallback);
+                    }
+                } catch (_) { /* ignore */ }
             }
+        };
+
+        run();
+
+        return () => {
+            disposed = true;
+            currentTexture?.dispose();
         };
     }, [textureUrl]);
 

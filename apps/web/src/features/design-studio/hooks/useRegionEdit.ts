@@ -1,4 +1,7 @@
 import { useState, useCallback } from "react";
+import { useAuthStore } from "@/src/lib/useAuthStore";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 export interface RegionSelection {
     x: number;
@@ -22,18 +25,28 @@ export function useRegionEdit(): UseRegionEditReturn {
     const [region, setRegion] = useState<RegionSelection | null>(null);
     const [isApplying, setIsApplying] = useState(false);
 
+    const { token } = useAuthStore();
+
     const clearRegion = useCallback(() => {
         setRegion(null);
     }, []);
 
     const applyEdit = useCallback(async (imageBase64: string, maskBase64: string): Promise<string | null> => {
         if (!editPrompt || !imageBase64 || !maskBase64) return null;
+        
+        if (!token) {
+            console.error("No auth token found");
+            return null;
+        }
 
         setIsApplying(true);
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/generation/edit`, {
+            const response = await fetch(`${API_URL}/api/generation/edit`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { 
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
                 body: JSON.stringify({
                     image_base64: imageBase64,
                     mask_base64: maskBase64,

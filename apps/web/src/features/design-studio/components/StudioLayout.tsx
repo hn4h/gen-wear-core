@@ -34,16 +34,17 @@ export function StudioLayout() {
         clearRegion,
     } = useRegionEdit();
 
-    // Current displayed image (either original or edited)
-    const [currentImageUrl, setCurrentImageUrl] = useState<string | undefined>();
+    // Edited image overrides the original generated image
+    const [editedImageUrl, setEditedImageUrl] = useState<string | undefined>();
 
-    // Update current image when new design is generated
+    // Update current image when new design is generated (reset edit)
     const handleGenerate = useCallback(async () => {
+        setEditedImageUrl(undefined); // reset edit when re-generating
         await generatePattern();
     }, [generatePattern]);
 
-    // When textureUrl changes, update currentImageUrl
-    const displayedImage = textureUrl || currentImageUrl;
+    // editedImageUrl takes priority over textureUrl (original generated)
+    const displayedImage = editedImageUrl || textureUrl;
 
     // Handle mask generation from canvas
     const handleMaskGenerated = useCallback((mask: string | null) => {
@@ -61,7 +62,7 @@ export function StudioLayout() {
         
         const editedUrl = await applyEdit(imageBase64, maskBase64);
         if (editedUrl) {
-            setCurrentImageUrl(editedUrl);
+            setEditedImageUrl(editedUrl); // ✅ override displayed image
             clearRegion();
             setEditPrompt("");
             setMaskBase64(null);

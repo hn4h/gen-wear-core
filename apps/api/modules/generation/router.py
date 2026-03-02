@@ -1,7 +1,9 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from .schemas import GenerateRequest, RegionEditRequest
 from .service import generate_pattern_service
 from .edit_service import edit_region_service
+from apps.api.modules.auth.service import get_current_user
+from apps.api.modules.auth.models import User
 
 router = APIRouter()
 
@@ -9,7 +11,10 @@ import logging
 from fastapi import HTTPException
 
 @router.post("")
-def generate_pattern(request: GenerateRequest):
+def generate_pattern(
+    request: GenerateRequest,
+    current_user: User = Depends(get_current_user)
+):
     try:
         return generate_pattern_service(request.prompt)
     except Exception as e:
@@ -17,7 +22,10 @@ def generate_pattern(request: GenerateRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/edit")
-def edit_region(request: RegionEditRequest):
+def edit_region(
+    request: RegionEditRequest,
+    current_user: User = Depends(get_current_user)
+):
     """
     Edit a region of an existing image based on a mask and prompt.
     
