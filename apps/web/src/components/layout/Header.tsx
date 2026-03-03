@@ -81,6 +81,9 @@ export function Header() {
             <Link href="/studio" className="text-gray-300 hover:text-white transition-colors font-medium">
               AI Studio
             </Link>
+            <Link href="/blog" className="text-gray-300 hover:text-white transition-colors font-medium">
+              Blog
+            </Link>
             <Link href="/about" className="text-gray-300 hover:text-white transition-colors font-medium">
               Về chúng tôi
             </Link>
@@ -167,6 +170,9 @@ export function Header() {
             </Link>
             <Link href="/studio" className="block text-lg text-gray-300 hover:text-white font-medium">
               AI Studio
+            </Link>
+            <Link href="/blog" className="block text-lg text-gray-300 hover:text-white font-medium">
+              Blog
             </Link>
             <div className="pt-4 border-t border-white/10 flex flex-col gap-4">
               {user ? (

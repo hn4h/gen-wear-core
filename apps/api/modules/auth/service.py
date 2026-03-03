@@ -19,6 +19,7 @@ ACCESS_TOKEN_EXPIRE_DAYS = 7
 
 # Security scheme
 security = HTTPBearer()
+security_optional = HTTPBearer(auto_error=False)
 
 def hash_password(password: str) -> str:
     """Hash a plain password"""
@@ -100,6 +101,24 @@ def get_current_user(
         )
     
     return user
+
+def get_optional_current_user(
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security_optional),
+    db: Session = Depends(get_db)
+) -> Optional[User]:
+    """Get current user if token provided, else return None"""
+    if credentials is None:
+        return None
+    try:
+        token = credentials.credentials
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id: str = payload.get("sub")
+        if user_id is None:
+            return None
+        user = db.query(User).filter(User.id == user_id).first()
+        return user if (user and user.is_active) else None
+    except JWTError:
+        return None
 
 def update_user(db: Session, user: User, full_name: str) -> User:
     """Update user profile"""

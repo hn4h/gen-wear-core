@@ -30,5 +30,6 @@ def init_db():
     from apps.api.modules.orders.models import Order, OrderItem
     from apps.api.modules.products.models import Product
     from apps.api.modules.designs.models import SavedDesign
+    from apps.api.modules.blog.models import BlogPost, BlogComment, BlogLike
     Base.metadata.create_all(bind=engine)
 

@@ -10,6 +10,8 @@ from apps.api.modules.products.router import (
 )
 from apps.api.modules.admin.router import router as admin_router
 from apps.api.modules.auth.database import init_db
+from fastapi.staticfiles import StaticFiles
+import os
 
 app = FastAPI(title="Gen Wear API", redirect_slashes=False)
 
@@ -63,6 +65,14 @@ from apps.api.modules.designs.router import router as designs_router
 app.include_router(cart_router, prefix="/api/cart", tags=["cart"])
 app.include_router(orders_router, prefix="/api/orders", tags=["orders"])
 app.include_router(designs_router, prefix="/api/designs", tags=["designs"])
+
+from apps.api.modules.blog.router import router as blog_router
+app.include_router(blog_router, prefix="/api/blog", tags=["blog"])
+
+# Serve uploaded blog images as static files
+_static_dir = os.path.join(os.path.dirname(__file__), "static", "blog-images")
+os.makedirs(_static_dir, exist_ok=True)
+app.mount("/static/blog-images", StaticFiles(directory=_static_dir), name="blog-images")
 
 
 from fastapi.exceptions import RequestValidationError
