@@ -10,7 +10,7 @@ services:
       - "3000:3000"
     environment:
       # URL trình duyệt gọi API (Client Side)
-      - NEXT_PUBLIC_API_URL=https://api.genwear.io.vn
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
     depends_on:
       - api
     volumes:
@@ -31,6 +31,10 @@ services:
       - GEMINI_API_KEY=${GEMINI_API_KEY}
       - DATABASE_URL=postgresql://genwear:password@postgres:5432/genwear_db
       - REDIS_URL=redis://redis:6379
+      - PAYOS_CLIENT_ID=${PAYOS_CLIENT_ID}
+      - PAYOS_API_KEY=${PAYOS_API_KEY}
+      - PAYOS_CHECKSUM_KEY=${PAYOS_CHECKSUM_KEY}
+      - FRONTEND_URL=http://localhost:3000
     depends_on:
       postgres:
         condition: service_healthy

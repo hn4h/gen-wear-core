@@ -81,6 +81,9 @@ export function Header() {
             <Link href="/studio" className="text-gray-300 hover:text-white transition-colors font-medium">
               AI Studio
             </Link>
+            <Link href="/blog" className="text-gray-300 hover:text-white transition-colors font-medium">
+              Blog
+            </Link>
             <Link href="/about" className="text-gray-300 hover:text-white transition-colors font-medium">
               Về chúng tôi
             </Link>
@@ -109,6 +112,9 @@ export function Header() {
                                 Admin Dashboard
                             </Link>
                         )}
+                        <Link href="/designs" className="block text-xs text-slate-300 hover:text-white mb-1">
+                            Thiết kế của tôi
+                        </Link>
                         <Link href="/orders" className="block text-xs text-slate-300 hover:text-white mb-1">
                             Lịch sử đơn hàng
                         </Link>
@@ -165,6 +171,9 @@ export function Header() {
             <Link href="/studio" className="block text-lg text-gray-300 hover:text-white font-medium">
               AI Studio
             </Link>
+            <Link href="/blog" className="block text-lg text-gray-300 hover:text-white font-medium">
+              Blog
+            </Link>
             <div className="pt-4 border-t border-white/10 flex flex-col gap-4">
               {user ? (
                  <>
@@ -180,6 +189,12 @@ export function Header() {
                                     Admin Dashboard
                                 </Link>
                             )}
+                            <Link href="/designs" className="block text-sm text-gray-300 hover:text-white mt-1">
+                                Thiết kế của tôi
+                            </Link>
+                            <Link href="/orders" className="block text-sm text-gray-300 hover:text-white mt-1">
+                                Lịch sử đơn hàng
+                            </Link>
                         </div>
                     </div>
                     <button 

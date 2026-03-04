@@ -5,11 +5,13 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 export interface OrderItem {
     id: string;
-    product_id: string;
+    product_id: string | null;
     quantity: number;
     price: number;
     product_name: string;
     product_image?: string;
+    is_custom_design?: boolean;
+    design_image_url?: string;
 }
 
 export interface Order {
@@ -23,6 +25,8 @@ export interface Order {
     status: 'PENDING' | 'CONFIRMED' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
     total_amount: number;
     created_at: string;
+    custom_notes?: string;
+    checkout_url?: string;
     items: OrderItem[];
 }
 
@@ -37,6 +41,11 @@ export interface CreateOrderData {
         product_id: string;
         quantity: number;
     }[];
+    // Custom AI Design Order fields
+    custom_design_url?: string;
+    custom_design_notes?: string;
+    custom_design_price?: number;
+    custom_design_quantity?: number;
 }
 
 export interface OrderListResponse {

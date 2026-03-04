@@ -159,13 +159,13 @@ export function ProductFilters({
                 <h3 className="text-white font-semibold mb-4">Price Range</h3>
                 <div className="space-y-4 px-2">
                     <div className="flex items-center justify-between text-sm text-slate-400">
-                        <span>${priceRange[0]}</span>
-                        <span>${priceRange[1]}</span>
+                        <span>{priceRange[0].toLocaleString('vi-VN')}₫</span>
+                        <span>{priceRange[1].toLocaleString('vi-VN')}₫</span>
                     </div>
                     <input
                         type="range"
                         min="0"
-                        max="1000"
+                        max="1000000"
                         value={priceRange[1]}
                         onChange={(e) => onPriceRangeChange([priceRange[0], parseInt(e.target.value)])}
                         className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-purple-500"

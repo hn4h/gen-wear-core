@@ -9,6 +9,10 @@ from apps.api.modules.products.models import Product
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
+import time
+import os
+from apps.api.modules.payment.payos_client import payos_client
+from payos import ItemData, PaymentData
 
 router = APIRouter()
 
@@ -25,20 +29,28 @@ class CreateOrderRequest(BaseModel):
     city: str
     payment_method: str = "cod"
     items: Optional[List[OrderItemBase]] = None # Optional: If not provided, use cart
+    # Custom AI Design Order fields
+    custom_design_url: Optional[str] = None
+    custom_design_notes: Optional[str] = None
+    custom_design_price: Optional[float] = None
+    custom_design_quantity: Optional[int] = 1
 
 class OrderItemResponse(BaseModel):
     id: str
-    product_id: str
+    product_id: Optional[str]
     quantity: int
     price: float
     product_name: str
     product_image: Optional[str]
+    is_custom_design: bool = False
+    design_image_url: Optional[str] = None
 
     class Config:
         from_attributes = True
 
 class OrderResponse(BaseModel):
     id: str
+    order_code: Optional[int] = None
     full_name: str
     phone_number: str
     email: str
@@ -48,6 +60,8 @@ class OrderResponse(BaseModel):
     status: str
     total_amount: float
     created_at: datetime
+    custom_notes: Optional[str] = None
+    checkout_url: Optional[str] = None
     items: List[OrderItemResponse]
 
     class Config:
@@ -64,9 +78,10 @@ class OrderListResponse(BaseModel):
     total_pages: int
 
 # Helpers
-def map_order_response(order: Order) -> OrderResponse:
+def map_order_response(order: Order, checkout_url: Optional[str] = None) -> OrderResponse:
     return OrderResponse(
         id=order.id,
+        order_code=order.order_code,
         full_name=order.full_name,
         phone_number=order.phone_number,
         email=order.email,
@@ -76,25 +91,83 @@ def map_order_response(order: Order) -> OrderResponse:
         status=order.status,
         total_amount=order.total_amount,
         created_at=order.created_at,
+        custom_notes=order.custom_notes,
+        checkout_url=checkout_url,
         items=[
             OrderItemResponse(
                 id=item.id,
                 product_id=item.product_id,
                 quantity=item.quantity,
                 price=item.price,
-                product_name=item.product.name,
-                product_image=item.product.image_url
+                product_name=item.product_name_snapshot or (item.product.name if item.product else "Custom Design"),
+                product_image=item.product_image_snapshot or (item.product.image_url if item.product else None),
+                is_custom_design=item.is_custom_design or False,
+                design_image_url=item.design_image_url
             ) for item in order.items
         ]
     )
 
-@router.post("/", response_model=OrderResponse)
+@router.post("", response_model=OrderResponse)
 async def create_order(
     order_data: CreateOrderRequest,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user)
 ):
-    # Determine items to order
+    # --- Custom AI Design Order ---
+    if order_data.custom_design_url:
+        price = order_data.custom_design_price or 150000.0
+        quantity = order_data.custom_design_quantity or 1
+        total_amount = price * quantity
+        
+        new_order = Order(
+            user_id=user.id,
+            order_code=int(time.time() * 1000) % 9007199254740991,
+            full_name=order_data.full_name,
+            phone_number=order_data.phone_number,
+            email=order_data.email,
+            address=order_data.address,
+            city=order_data.city,
+            payment_method=order_data.payment_method,
+            total_amount=total_amount,
+            status=OrderStatus.PENDING,
+            custom_notes=order_data.custom_design_notes or "Khăn thiết kế AI"
+        )
+        db.add(new_order)
+        db.flush()
+        
+        custom_item = OrderItem(
+            order_id=new_order.id,
+            product_id=None,
+            quantity=quantity,
+            price=price,
+            product_name_snapshot=order_data.custom_design_notes or "Khăn thiết kế AI",
+            product_image_snapshot=order_data.custom_design_url,
+            is_custom_design=True,
+            design_image_url=order_data.custom_design_url
+        )
+        db.add(custom_item)
+        db.commit()
+        db.refresh(new_order)
+        
+        checkout_url = None
+        if new_order.payment_method == "payos" and payos_client:
+            domain = os.environ.get("FRONTEND_URL", "http://localhost:3000")
+            try:
+                payment_data = PaymentData(
+                    orderCode=new_order.order_code,
+                    amount=int(new_order.total_amount),
+                    description="Gen Wear " + str(new_order.order_code)[-6:],
+                    items=[ItemData(name=order_data.custom_design_notes or "Khăn thiết kế AI", quantity=quantity, price=int(price))],
+                    cancelUrl=f"{domain}/checkout/cancel",
+                    returnUrl=f"{domain}/checkout/success"
+                )
+                checkout_url = payos_client.createPaymentLink(paymentData=payment_data).checkoutUrl
+            except Exception as e:
+                print(f"Error creating PayOS payment link: {e}")
+                
+        return map_order_response(new_order, checkout_url=checkout_url)
+
+    # --- Standard Order (from Cart or direct items) ---
     items_to_process = []
     
     if order_data.items:
@@ -128,6 +201,7 @@ async def create_order(
     # Create Order
     new_order = Order(
         user_id=user.id,
+        order_code=int(time.time() * 1000) % 9007199254740991,
         full_name=order_data.full_name,
         phone_number=order_data.phone_number,
         email=order_data.email,
@@ -146,12 +220,11 @@ async def create_order(
             order_id=new_order.id,
             product_id=item["product"].id,
             quantity=item["quantity"],
-            price=item["product"].price
+            price=item["product"].price,
+            product_name_snapshot=item["product"].name,
+            product_image_snapshot=item["product"].image_url
         )
         db.add(order_item)
-        
-        # Optional: Reduce Stock here
-        # item["product"].stock -= item["quantity"]
         
     # Clear Cart if used
     if not order_data.items:
@@ -160,7 +233,24 @@ async def create_order(
     db.commit()
     db.refresh(new_order)
     
-    return map_order_response(new_order)
+    checkout_url = None
+    if new_order.payment_method == "payos" and payos_client:
+        domain = os.environ.get("FRONTEND_URL", "http://localhost:3000")
+        try:
+            payos_items = [ItemData(name=item["product"].name[:250], quantity=item["quantity"], price=int(item["product"].price)) for item in items_to_process]
+            payment_data = PaymentData(
+                orderCode=new_order.order_code,
+                amount=int(new_order.total_amount),
+                description="Gen Wear " + str(new_order.order_code)[-6:],
+                items=payos_items,
+                cancelUrl=f"{domain}/checkout/cancel",
+                returnUrl=f"{domain}/checkout/success"
+            )
+            checkout_url = payos_client.createPaymentLink(paymentData=payment_data).checkoutUrl
+        except Exception as e:
+            print(f"Error creating PayOS payment link: {e}")
+            
+    return map_order_response(new_order, checkout_url=checkout_url)
 
 @router.get("/my", response_model=List[OrderResponse])
 async def get_my_orders(
@@ -190,7 +280,7 @@ async def get_order(
 
 # --- Admin Endpoints ---
 
-@router.get("/", response_model=OrderListResponse)
+@router.get("", response_model=OrderListResponse)
 async def list_orders(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),

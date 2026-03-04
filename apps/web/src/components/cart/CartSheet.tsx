@@ -81,7 +81,7 @@ export function CartSheet() {
                                     <div className="flex-1 flex flex-col justify-between">
                                         <div>
                                             <h3 className="font-medium text-white line-clamp-1">{item.name}</h3>
-                                            <p className="text-sm text-slate-400">${item.price.toLocaleString()}</p>
+                                            <p className="text-sm text-slate-400">{item.price.toLocaleString('vi-VN')}₫</p>
                                         </div>
 
                                         <div className="flex items-center justify-between">
@@ -119,7 +119,7 @@ export function CartSheet() {
                         <div className="p-6 bg-slate-800/50 border-t border-white/10 space-y-4">
                             <div className="flex items-center justify-between text-lg font-bold text-white">
                                 <span>Total</span>
-                                <span>${totalPrice().toLocaleString()}</span>
+                                <span>{totalPrice().toLocaleString('vi-VN')}₫</span>
                             </div>
                             <button 
                                 onClick={() => {

@@ -262,7 +262,7 @@ export default function AdminProductsPage() {
                                     <td className="p-4 text-slate-300">
                                         {categories.find(c => c.id === product.category_id)?.name || 'Uncategorized'}
                                     </td>
-                                    <td className="p-4 text-white font-medium">${product.price.toLocaleString()}</td>
+                                    <td className="p-4 text-white font-medium">{product.price.toLocaleString('vi-VN')}₫</td>
                                     <td className="p-4">
                                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                                             product.stock > 10 ? 'bg-green-500/10 text-green-400' : 
