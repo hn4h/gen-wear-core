@@ -81,9 +81,10 @@ export default function CheckoutPage() {
         setIsProcessing(true);
 
         try {
+            let orderResponse;
             if (isDesignOrder && designImageUrl) {
                 // Design order
-                await ordersAPI.createOrder({
+                orderResponse = await ordersAPI.createOrder({
                     full_name: formData.fullName,
                     phone_number: formData.phone,
                     email: formData.email,
@@ -98,7 +99,7 @@ export default function CheckoutPage() {
                 clearDesign();
             } else {
                 // Normal cart order
-                await ordersAPI.createOrder({
+                orderResponse = await ordersAPI.createOrder({
                     full_name: formData.fullName,
                     phone_number: formData.phone,
                     email: formData.email,
@@ -108,6 +109,12 @@ export default function CheckoutPage() {
                 });
                 clearCart();
             }
+            
+            if (orderResponse?.checkout_url) {
+                window.location.href = orderResponse.checkout_url;
+                return;
+            }
+            
             setIsSuccess(true);
         } catch (error) {
             console.error('Failed to create order:', error);
@@ -269,7 +276,8 @@ export default function CheckoutPage() {
                                             className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
                                         >
                                             <option value="cod">Thanh toán khi nhận hàng (COD)</option>
-                                            <option value="bank">Chuyển khoản ngân hàng</option>
+                                            <option value="bank">Chuyển khoản trực tiếp</option>
+                                            <option value="payos">Thanh toán an toàn qua PayOS (QR Code)</option>
                                         </select>
                                     </div>
                                 </div>

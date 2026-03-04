@@ -16,6 +16,7 @@ class Order(Base):
     __tablename__ = "orders"
     
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()), index=True)
+    order_code = Column(Integer, unique=True, index=True, nullable=True) # PayOS requires integer ID
     user_id = Column(String, ForeignKey("users.id"), nullable=True) # Check if guest orders are allowed, currently enforcing user login for order history
     
     # Shipping Info (Snapshotted at time of order)

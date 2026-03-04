@@ -26,6 +26,7 @@ export interface Order {
     total_amount: number;
     created_at: string;
     custom_notes?: string;
+    checkout_url?: string;
     items: OrderItem[];
 }
 

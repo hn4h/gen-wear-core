@@ -9,6 +9,10 @@ from apps.api.modules.products.models import Product
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
+import time
+import os
+from apps.api.modules.payment.payos_client import payos_client
+from payos import ItemData, PaymentData
 
 router = APIRouter()
 
@@ -46,6 +50,7 @@ class OrderItemResponse(BaseModel):
 
 class OrderResponse(BaseModel):
     id: str
+    order_code: Optional[int] = None
     full_name: str
     phone_number: str
     email: str
@@ -56,6 +61,7 @@ class OrderResponse(BaseModel):
     total_amount: float
     created_at: datetime
     custom_notes: Optional[str] = None
+    checkout_url: Optional[str] = None
     items: List[OrderItemResponse]
 
     class Config:
@@ -72,9 +78,10 @@ class OrderListResponse(BaseModel):
     total_pages: int
 
 # Helpers
-def map_order_response(order: Order) -> OrderResponse:
+def map_order_response(order: Order, checkout_url: Optional[str] = None) -> OrderResponse:
     return OrderResponse(
         id=order.id,
+        order_code=order.order_code,
         full_name=order.full_name,
         phone_number=order.phone_number,
         email=order.email,
@@ -85,6 +92,7 @@ def map_order_response(order: Order) -> OrderResponse:
         total_amount=order.total_amount,
         created_at=order.created_at,
         custom_notes=order.custom_notes,
+        checkout_url=checkout_url,
         items=[
             OrderItemResponse(
                 id=item.id,
@@ -113,6 +121,7 @@ async def create_order(
         
         new_order = Order(
             user_id=user.id,
+            order_code=int(time.time() * 1000) % 9007199254740991,
             full_name=order_data.full_name,
             phone_number=order_data.phone_number,
             email=order_data.email,
@@ -139,7 +148,24 @@ async def create_order(
         db.add(custom_item)
         db.commit()
         db.refresh(new_order)
-        return map_order_response(new_order)
+        
+        checkout_url = None
+        if new_order.payment_method == "payos" and payos_client:
+            domain = os.environ.get("FRONTEND_URL", "http://localhost:3000")
+            try:
+                payment_data = PaymentData(
+                    orderCode=new_order.order_code,
+                    amount=int(new_order.total_amount),
+                    description="Gen Wear " + str(new_order.order_code)[-6:],
+                    items=[ItemData(name=order_data.custom_design_notes or "Khăn thiết kế AI", quantity=quantity, price=int(price))],
+                    cancelUrl=f"{domain}/checkout/cancel",
+                    returnUrl=f"{domain}/checkout/success"
+                )
+                checkout_url = payos_client.createPaymentLink(paymentData=payment_data).checkoutUrl
+            except Exception as e:
+                print(f"Error creating PayOS payment link: {e}")
+                
+        return map_order_response(new_order, checkout_url=checkout_url)
 
     # --- Standard Order (from Cart or direct items) ---
     items_to_process = []
@@ -175,6 +201,7 @@ async def create_order(
     # Create Order
     new_order = Order(
         user_id=user.id,
+        order_code=int(time.time() * 1000) % 9007199254740991,
         full_name=order_data.full_name,
         phone_number=order_data.phone_number,
         email=order_data.email,
@@ -206,7 +233,24 @@ async def create_order(
     db.commit()
     db.refresh(new_order)
     
-    return map_order_response(new_order)
+    checkout_url = None
+    if new_order.payment_method == "payos" and payos_client:
+        domain = os.environ.get("FRONTEND_URL", "http://localhost:3000")
+        try:
+            payos_items = [ItemData(name=item["product"].name[:250], quantity=item["quantity"], price=int(item["product"].price)) for item in items_to_process]
+            payment_data = PaymentData(
+                orderCode=new_order.order_code,
+                amount=int(new_order.total_amount),
+                description="Gen Wear " + str(new_order.order_code)[-6:],
+                items=payos_items,
+                cancelUrl=f"{domain}/checkout/cancel",
+                returnUrl=f"{domain}/checkout/success"
+            )
+            checkout_url = payos_client.createPaymentLink(paymentData=payment_data).checkoutUrl
+        except Exception as e:
+            print(f"Error creating PayOS payment link: {e}")
+            
+    return map_order_response(new_order, checkout_url=checkout_url)
 
 @router.get("/my", response_model=List[OrderResponse])
 async def get_my_orders(
