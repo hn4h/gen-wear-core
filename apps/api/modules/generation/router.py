@@ -4,7 +4,7 @@ from .service import generate_pattern_service
 from .edit_service import edit_region_service
 from .models import AIGenerationLog
 from apps.api.modules.auth.database import get_db
-from apps.api.modules.auth.service import get_optional_current_user
+from apps.api.modules.auth.service import get_optional_current_user, get_current_user
 from apps.api.modules.auth.models import User
 from sqlalchemy.orm import Session
 from typing import Optional

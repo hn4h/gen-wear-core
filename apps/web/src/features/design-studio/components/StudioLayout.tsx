@@ -46,16 +46,12 @@ export function StudioLayout() {
 
     // Update current image when new design is generated (reset edit)
     const handleGenerate = useCallback(async () => {
-<<<<<<< HEAD
-        setEditedImageUrl(undefined); // reset edit when re-generating
-=======
         const token = getAuthToken();
         if (!token) {
             alert("Vui lòng đăng nhập để sử dụng tính năng tạo thiết kế AI");
             router.push("/login?redirect=/studio");
             return;
         }
->>>>>>> feature/auth-and-ui-updates
         await generatePattern();
     }, [generatePattern, router]);
 
