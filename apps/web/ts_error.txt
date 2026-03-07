@@ -1,0 +1,182 @@
+﻿app/(auth)/login/page.tsx(110,20): error TS2786: 'Phone' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode'.
+        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode'.
+          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
+app/(auth)/login/page.tsx(130,20): error TS2786: 'Lock' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode'.
+        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode'.
+          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
+app/(auth)/login/page.tsx(145,36): error TS2786: 'EyeOff' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode'.
+        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode'.
+          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
+app/(auth)/login/page.tsx(145,69): error TS2786: 'Eye' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode'.
+        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode'.
+          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
+app/(auth)/login/page.tsx(158,20): error TS2786: 'Loader2' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode'.
+        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode'.
+          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
+app/(auth)/register/page.tsx(145,20): error TS2786: 'Phone' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode'.
+        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode'.
+          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
+app/(auth)/register/page.tsx(165,20): error TS2786: 'User' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode'.
+        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode'.
+          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
+app/(auth)/register/page.tsx(185,20): error TS2786: 'Lock' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode'.
+        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode'.
+          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
+app/(auth)/register/page.tsx(200,36): error TS2786: 'EyeOff' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode'.
+        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode'.
+          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
+app/(auth)/register/page.tsx(200,69): error TS2786: 'Eye' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode'.
+        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode'.
+          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
+app/(auth)/register/page.tsx(225,20): error TS2786: 'Lock' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode'.
+        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode'.
+          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
+app/(auth)/register/page.tsx(240,43): error TS2786: 'EyeOff' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode'.
+        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode'.
+          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
+app/(auth)/register/page.tsx(240,76): error TS2786: 'Eye' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode'.
+        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode'.
+          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
+app/(auth)/register/page.tsx(245,20): error TS2786: 'CheckCircle' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode'.
+        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode'.
+          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
+app/(auth)/register/page.tsx(259,20): error TS2786: 'Loader2' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode'.
+        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode'.
+          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
+app/pricing/page.tsx(43,42): error TS2786: 'Check' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode'.
+        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode'.
+          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
+app/pricing/page.tsx(47,42): error TS2786: 'Check' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode'.
+        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode'.
+          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
+app/pricing/page.tsx(51,42): error TS2786: 'Check' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode'.
+        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode'.
+          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
+app/pricing/page.tsx(55,42): error TS2786: 'X' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode'.
+        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode'.
+          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
+app/pricing/page.tsx(59,42): error TS2786: 'X' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode'.
+        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode'.
+          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
+app/pricing/page.tsx(63,42): error TS2786: 'X' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode'.
+        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode'.
+          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
+app/pricing/page.tsx(84,42): error TS2786: 'Sparkles' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode'.
+        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode'.
+          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
+app/pricing/page.tsx(102,42): error TS2786: 'Check' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode'.
+        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode'.
+          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
+app/pricing/page.tsx(106,42): error TS2786: 'Zap' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode'.
+        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode'.
+          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
+app/pricing/page.tsx(110,42): error TS2786: 'Shield' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode'.
+        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode'.
+          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
+app/pricing/page.tsx(114,42): error TS2786: 'ImageIcon' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode'.
+        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode'.
+          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
+app/pricing/page.tsx(118,42): error TS2786: 'Check' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode'.
+        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode'.
+          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
+app/pricing/page.tsx(139,42): error TS2786: 'Zap' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode'.
+        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode'.
+          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
+app/pricing/page.tsx(146,42): error TS2786: 'Check' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode'.
+        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode'.
+          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
+app/pricing/page.tsx(153,42): error TS2786: 'Shield' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode'.
+        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode'.
+          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
+src/components/profile/ProfileEdit.tsx(36,51): error TS2339: Property 'updateProfile' does not exist on type '{ register: (phoneNumber: string, fullName: string, password: string) => Promise<any>; login: (phoneNumber: string, password: string) => Promise<any>; getCurrentUser: () => Promise<...>; logout: () => void; }'.
+src/components/profile/ProfileEdit.tsx(46,31): error TS2339: Property 'changePassword' does not exist on type '{ register: (phoneNumber: string, fullName: string, password: string) => Promise<any>; login: (phoneNumber: string, password: string) => Promise<any>; getCurrentUser: () => Promise<...>; logout: () => void; }'.

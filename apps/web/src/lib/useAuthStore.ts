@@ -6,6 +6,7 @@ export interface User {
   phone_number: string;
   full_name: string;
   role?: string;
+  account_tier?: string;
   created_at: string;
   is_active: boolean;
 }

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Boolean, DateTime
+from sqlalchemy import Column, String, Boolean, DateTime, Integer
 import uuid
 from datetime import datetime
 from apps.api.modules.auth.database import Base
@@ -11,6 +11,9 @@ class User(Base):
     full_name = Column(String, nullable=False)
     hashed_password = Column(String, nullable=False)
     role = Column(String, default="USER", nullable=False) # "USER" or "ADMIN"
+    account_tier = Column(String, default="FREE", nullable=False)  # "FREE" or "PRO"
+    daily_credits_remaining = Column(Integer, default=5, nullable=False)
+    daily_credits_reset_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     is_active = Column(Boolean, default=True)
     

@@ -40,6 +40,9 @@ const STYLE_OPTIONS = [
     { value: "geometric", label: "Hình học" },
 ];
 
+import { useAuthStore } from "@/src/lib/useAuthStore";
+import Link from "next/link";
+
 export function StudioLeftPanel({
     designPrompt,
     setDesignPrompt,
@@ -57,8 +60,10 @@ export function StudioLeftPanel({
     hasImage,
     onComplete,
 }: StudioLeftPanelProps) {
+    const { user } = useAuthStore();
     const canGenerate = designPrompt.trim().length > 0 && !isGenerating;
     const canApplyEdit = hasImage && hasMask && editPrompt.trim().length > 0 && !isApplying;
+    const isFreeTier = user?.account_tier === "FREE";
 
     return (
         <div className="w-full lg:w-[400px] flex-shrink-0 bg-slate-800/50 backdrop-blur-sm border-r border-white/10 flex flex-col">
@@ -156,6 +161,20 @@ export function StudioLeftPanel({
                         <p className="text-sm text-gray-500 italic">
                             Tạo thiết kế trước để có thể chỉnh sửa
                         </p>
+                    ) : isFreeTier ? (
+                        <div className="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20 text-center">
+                            <SparklesIcon className="w-8 h-8 text-pink-400 mx-auto mb-2" />
+                            <h3 className="text-sm font-semibold text-white mb-2">Tính năng dành cho bản Pro</h3>
+                            <p className="text-xs text-gray-400 mb-4">
+                                Nâng cấp để mở khóa tính năng chọn vùng & chỉnh sửa chi tiết (Inpainting) mạnh mẽ bằng AI.
+                            </p>
+                            <Link 
+                                href="/pricing"
+                                className="inline-block py-2 px-4 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 text-white text-xs font-semibold hover:from-purple-700 hover:to-pink-700 transition"
+                            >
+                                Xem các gói nâng cấp
+                            </Link>
+                        </div>
                     ) : (
                         <>
                             {/* Region Status */}

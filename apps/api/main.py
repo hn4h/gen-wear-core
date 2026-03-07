@@ -53,9 +53,11 @@ app.include_router(admin_router, prefix="/api/admin", tags=["admin"])
 
 from apps.api.modules.cart.router import router as cart_router
 from apps.api.modules.orders.router import router as orders_router
+from apps.api.modules.credits.router import router as credits_router
 
 app.include_router(cart_router, prefix="/api/cart", tags=["cart"])
 app.include_router(orders_router, prefix="/api/orders", tags=["orders"])
+app.include_router(credits_router, prefix="/api/credits", tags=["credits"])
 
 
 from fastapi.exceptions import RequestValidationError

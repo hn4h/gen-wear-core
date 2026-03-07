@@ -3,8 +3,13 @@ import base64
 from google import genai
 from google.genai import types
 from .gemini_service import enhance_prompt
+from .watermark_service import apply_watermark
+from .resolution_service import resize_for_tier
+from apps.api.modules.credits.service import deduct_credit
+from apps.api.modules.auth.models import User
+from sqlalchemy.orm import Session
 
-def edit_region_service(image_base64: str, mask_base64: str, prompt: str) -> dict:
+def edit_region_service(image_base64: str, mask_base64: str, prompt: str, user: User, db: Session) -> dict:
     """
     Edit a region of the image based on the mask and prompt.
     
@@ -16,6 +21,9 @@ def edit_region_service(image_base64: str, mask_base64: str, prompt: str) -> dic
     Returns:
         dict with 'url' containing the edited image as data URI
     """
+    # 0. Check and deduct credit for editing
+    deduct_credit(user, db, "EDIT", description="Chỉnh sửa vùng: " + prompt[:30])
+    
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
         raise ValueError("GEMINI_API_KEY is not set in environment variables.")
@@ -63,7 +71,25 @@ def edit_region_service(image_base64: str, mask_base64: str, prompt: str) -> dic
                 
             # Get the edited image
             edited_bytes = response.generated_images[0].image.image_bytes
-            edited_base64 = base64.b64encode(edited_bytes).decode('utf-8')
+            
+            if isinstance(edited_bytes, str):
+                edited_base64 = edited_bytes
+            elif isinstance(edited_bytes, bytes):
+                try:
+                    decoded_str = edited_bytes.decode('utf-8')
+                    if decoded_str.startswith('iVBOR') or decoded_str.startswith('/9j/'):
+                        edited_base64 = decoded_str
+                    else:
+                        edited_base64 = base64.b64encode(edited_bytes).decode('utf-8')
+                except UnicodeDecodeError:
+                    edited_base64 = base64.b64encode(edited_bytes).decode('utf-8')
+            else:
+                edited_base64 = base64.b64encode(edited_bytes).decode('utf-8')
+            
+            # Apply tier-specific processing (Resolution & Watermark)
+            edited_base64 = resize_for_tier(edited_base64, user.account_tier)
+            if user.account_tier == "FREE":
+                edited_base64 = apply_watermark(edited_base64)
             
             return {
                 "url": f"data:image/png;base64,{edited_base64}",
@@ -90,7 +116,25 @@ def edit_region_service(image_base64: str, mask_base64: str, prompt: str) -> dic
                 raise ValueError("No images returned from fallback generation.")
                 
             generated_bytes = response.generated_images[0].image.image_bytes
-            generated_base64 = base64.b64encode(generated_bytes).decode('utf-8')
+            
+            if isinstance(generated_bytes, str):
+                generated_base64 = generated_bytes
+            elif isinstance(generated_bytes, bytes):
+                try:
+                    decoded_str = generated_bytes.decode('utf-8')
+                    if decoded_str.startswith('iVBOR') or decoded_str.startswith('/9j/'):
+                        generated_base64 = decoded_str
+                    else:
+                        generated_base64 = base64.b64encode(generated_bytes).decode('utf-8')
+                except UnicodeDecodeError:
+                    generated_base64 = base64.b64encode(generated_bytes).decode('utf-8')
+            else:
+                generated_base64 = base64.b64encode(generated_bytes).decode('utf-8')
+            
+            # Apply tier-specific processing
+            generated_base64 = resize_for_tier(generated_base64, user.account_tier)
+            if user.account_tier == "FREE":
+                generated_base64 = apply_watermark(generated_base64)
             
             return {
                 "url": f"data:image/png;base64,{generated_base64}",

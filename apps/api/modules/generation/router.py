@@ -4,6 +4,8 @@ from .service import generate_pattern_service
 from .edit_service import edit_region_service
 from apps.api.modules.auth.service import get_current_user
 from apps.api.modules.auth.models import User
+from apps.api.modules.auth.database import get_db
+from sqlalchemy.orm import Session
 
 router = APIRouter()
 
@@ -13,10 +15,11 @@ from fastapi import HTTPException
 @router.post("")
 def generate_pattern(
     request: GenerateRequest,
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
 ):
     try:
-        return generate_pattern_service(request.prompt)
+        return generate_pattern_service(request.prompt, current_user, db)
     except Exception as e:
         logging.exception("Error generating pattern")
         raise HTTPException(status_code=500, detail=str(e))
@@ -24,8 +27,12 @@ def generate_pattern(
 @router.post("/edit")
 def edit_region(
     request: RegionEditRequest,
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
 ):
+    if current_user.account_tier == "FREE":
+        from fastapi import HTTPException
+        raise HTTPException(status_code=403, detail="Tính năng chỉnh sửa vùng ảnh chỉ dành cho tài khoản Pro.")
     """
     Edit a region of an existing image based on a mask and prompt.
     
@@ -37,7 +44,9 @@ def edit_region(
         return edit_region_service(
             request.image_base64,
             request.mask_base64,
-            request.prompt
+            request.prompt,
+            current_user,
+            db
         )
     except Exception as e:
         logging.exception("Error editing region")
