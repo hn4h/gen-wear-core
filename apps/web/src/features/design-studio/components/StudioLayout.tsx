@@ -1,17 +1,24 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { StudioLeftPanel } from "./StudioLeftPanel";
 import { StudioCanvas } from "./StudioCanvas";
 import { Preview3DModal } from "./Preview3DModal";
 import { useDesignGeneration } from "../hooks/useDesignGeneration";
 import { useRegionEdit } from "../hooks/useRegionEdit";
 import { Header } from "@/src/components/layout/Header";
+import { useDesignOrderStore } from "@/src/lib/useDesignOrderStore";
+import { designsAPI } from "@/src/services/designs";
+import { getAuthToken } from "@/src/lib/useAuthStore";
 
 export function StudioLayout() {
+    const router = useRouter();
+    const { setDesign } = useDesignOrderStore();
     const [selectedStyle, setSelectedStyle] = useState("");
     const [show3DPreview, setShow3DPreview] = useState(false);
     const [maskBase64, setMaskBase64] = useState<string | null>(null);
+    const [isSaving, setIsSaving] = useState(false);
     
     // Design generation hook
     const {
@@ -39,9 +46,14 @@ export function StudioLayout() {
 
     // Update current image when new design is generated (reset edit)
     const handleGenerate = useCallback(async () => {
-        setEditedImageUrl(undefined); // reset edit when re-generating
+        const token = getAuthToken();
+        if (!token) {
+            alert("Vui lòng đăng nhập để sử dụng tính năng tạo thiết kế AI");
+            router.push("/login?redirect=/studio");
+            return;
+        }
         await generatePattern();
-    }, [generatePattern]);
+    }, [generatePattern, router]);
 
     // editedImageUrl takes priority over textureUrl (original generated)
     const displayedImage = editedImageUrl || textureUrl;
@@ -74,11 +86,36 @@ export function StudioLayout() {
         setShow3DPreview(true);
     }, []);
 
-    const handleSaveDesign = useCallback(() => {
-        // TODO: Implement save design logic
-        console.log("Saving design...", displayedImage);
-        setShow3DPreview(false);
-    }, [displayedImage]);
+    const handleSaveDesign = useCallback(async () => {
+        if (!displayedImage) return;
+
+        const token = getAuthToken();
+        if (!token) {
+            alert("Vui lòng đăng nhập để lưu thiết kế");
+            router.push("/login?redirect=/studio");
+            return;
+        }
+
+        try {
+            setIsSaving(true);
+            await designsAPI.saveDesign({
+                image_url: displayedImage,
+                prompt: designPrompt,
+            });
+            alert("Lưu thiết kế thành công! Bạn có thể xem lại trong mục 'Thiết kế của tôi'");
+        } catch (error) {
+            console.error("Error saving design:", error);
+            alert("Lưu thiết kế thất bại, vui lòng thử lại sau.");
+        } finally {
+            setIsSaving(false);
+        }
+    }, [displayedImage, designPrompt, router]);
+
+    const handleOrderDesign = useCallback(() => {
+        if (!displayedImage) return;
+        setDesign(displayedImage, designPrompt);
+        router.push('/checkout?type=design');
+    }, [displayedImage, designPrompt, setDesign, router]);
 
     return (
         <div className="min-h-screen bg-slate-900 flex flex-col">
@@ -103,6 +140,9 @@ export function StudioLayout() {
                     isApplying={isApplying}
                     hasImage={!!displayedImage}
                     onComplete={handleComplete}
+                    onOrderDesign={handleOrderDesign}
+                    onSaveDesign={handleSaveDesign}
+                    isSaving={isSaving}
                 />
 
                 {/* Right Panel - Canvas */}

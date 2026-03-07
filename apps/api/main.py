@@ -10,8 +10,10 @@ from apps.api.modules.products.router import (
 )
 from apps.api.modules.admin.router import router as admin_router
 from apps.api.modules.auth.database import init_db
+from fastapi.staticfiles import StaticFiles
+import os
 
-app = FastAPI(title="Gen Wear API")
+app = FastAPI(title="Gen Wear API", redirect_slashes=False)
 
 # CORS Config
 # origins = [
@@ -20,7 +22,12 @@ app = FastAPI(title="Gen Wear API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[ "https://genwear.io.vn","http://localhost:3000"],
+    allow_origins=[
+        "https://genwear.io.vn",
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "http://127.0.0.1:3000",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -55,9 +62,29 @@ from apps.api.modules.cart.router import router as cart_router
 from apps.api.modules.orders.router import router as orders_router
 from apps.api.modules.credits.router import router as credits_router
 
+
+app.include_router(credits_router, prefix="/api/credits", tags=["credits"])
+from apps.api.modules.designs.router import router as designs_router
+
 app.include_router(cart_router, prefix="/api/cart", tags=["cart"])
 app.include_router(orders_router, prefix="/api/orders", tags=["orders"])
-app.include_router(credits_router, prefix="/api/credits", tags=["credits"])
+app.include_router(designs_router, prefix="/api/designs", tags=["designs"])
+
+from apps.api.modules.blog.router import router as blog_router
+app.include_router(blog_router, prefix="/api/blog", tags=["blog"])
+
+from apps.api.modules.payment.router import router as payment_router
+app.include_router(payment_router, prefix="/api/payment", tags=["payment"])
+
+# Serve uploaded blog images as static files
+_static_dir = os.path.join(os.path.dirname(__file__), "static", "blog-images")
+os.makedirs(_static_dir, exist_ok=True)
+app.mount("/static/blog-images", StaticFiles(directory=_static_dir), name="blog-images")
+
+# Serve AI-generated design images from D drive (mounted at /app/uploads)
+_uploads_dir = os.getenv("UPLOAD_DIR", "/app/uploads")
+os.makedirs(_uploads_dir, exist_ok=True)
+app.mount("/static/designs", StaticFiles(directory=_uploads_dir), name="designs")
 
 
 from fastapi.exceptions import RequestValidationError

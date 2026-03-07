@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { productsAPI, Product } from '@/src/services/products';
 import { useCartStore } from '@/src/lib/useCartStore';
+import { useAuthStore } from '@/src/lib/useAuthStore';
 import { Star, ShoppingBag, ArrowLeft, Share2, Heart } from 'lucide-react';
 import Link from 'next/link';
 import { Header } from '@/src/components/layout/Header';
@@ -18,7 +19,9 @@ const HeartIcon = Heart as any;
 
 export default function ProductDetailPage() {
     const params = useParams();
+    const router = useRouter();
     const { addItem } = useCartStore();
+    const { user } = useAuthStore();
     const [product, setProduct] = useState<Product | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedSize, setSelectedSize] = useState('M');
@@ -56,6 +59,16 @@ export default function ProductDetailPage() {
             </div>
         );
     }
+
+    const handleAddToCart = () => {
+        if (!user) {
+            alert("Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng");
+            router.push(`/login?redirect=/products/${params.id}`);
+            return;
+        }
+        addItem(product);
+        alert("Thêm vào giỏ hàng thành công");
+    };
 
     return (
         <div className="min-h-screen bg-slate-900">
@@ -107,7 +120,7 @@ export default function ProductDetailPage() {
                             
                             <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">{product.name}</h1>
                             <p className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
-                                ${product.price.toLocaleString()}
+                                {product.price.toLocaleString('vi-VN')}₫
                             </p>
                         </div>
 
@@ -138,7 +151,7 @@ export default function ProductDetailPage() {
                         {/* Actions */}
                         <div className="flex gap-4 pt-4 border-t border-white/10">
                             <button 
-                                onClick={() => addItem(product)}
+                                onClick={handleAddToCart}
                                 className="flex-1 bg-white text-slate-900 h-14 rounded-xl font-bold text-lg hover:bg-purple-50 transition-colors flex items-center justify-center gap-2"
                             >
                                 <ShoppingBagIcon className="w-5 h-5" />

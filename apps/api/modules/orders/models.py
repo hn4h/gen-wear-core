@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, Float, ForeignKey, DateTime, Enum
+from sqlalchemy import Column, String, Integer, BigInteger, Float, ForeignKey, DateTime, Enum, Boolean
 from sqlalchemy.orm import relationship
 import uuid
 from datetime import datetime
@@ -16,6 +16,7 @@ class Order(Base):
     __tablename__ = "orders"
     
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()), index=True)
+    order_code = Column(BigInteger, unique=True, index=True, nullable=True) # PayOS requires integer ID
     user_id = Column(String, ForeignKey("users.id"), nullable=True) # Check if guest orders are allowed, currently enforcing user login for order history
     
     # Shipping Info (Snapshotted at time of order)
@@ -27,6 +28,9 @@ class Order(Base):
     
     # Payment Info
     payment_method = Column(String, default="cod")
+    
+    # Custom design notes (for AI design orders)
+    custom_notes = Column(String, nullable=True)
     
     # Order Status
     status = Column(String, default=OrderStatus.PENDING)
@@ -44,11 +48,19 @@ class OrderItem(Base):
     
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()), index=True)
     order_id = Column(String, ForeignKey("orders.id"), nullable=False)
-    product_id = Column(String, ForeignKey("products.id"), nullable=False)
+    product_id = Column(String, ForeignKey("products.id"), nullable=True)  # Nullable for custom design orders
     
     quantity = Column(Integer, nullable=False)
     price = Column(Float, nullable=False) # Snapshot price at time of order
     
+    # Snapshot fields (used when product_id is None for custom orders)
+    product_name_snapshot = Column(String, nullable=True)
+    product_image_snapshot = Column(String, nullable=True)
+    
+    # Custom AI Design fields
+    is_custom_design = Column(Boolean, default=False)
+    design_image_url = Column(String, nullable=True)
+    
     # Relationships
     order = relationship("Order", back_populates="items")
-    product = relationship("apps.api.modules.products.models.Product")
+    product = relationship("apps.api.modules.products.models.Product", foreign_keys=[product_id])

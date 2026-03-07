@@ -60,7 +60,7 @@ def get_cart_response(cart: Cart) -> CartResponse:
         total_items=total_items
     )
 
-@router.get("/", response_model=CartResponse)
+@router.get("", response_model=CartResponse)
 async def get_cart(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user)
@@ -170,7 +170,7 @@ async def remove_cart_item(
     db.refresh(cart)
     return get_cart_response(cart)
 
-@router.delete("/", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("", status_code=status.HTTP_204_NO_CONTENT)
 async def clear_cart(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user)
