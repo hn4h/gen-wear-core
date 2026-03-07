@@ -151,7 +151,7 @@ async def create_order(
         
         checkout_url = None
         if new_order.payment_method == "payos" and payos_client:
-            domain = os.environ.get("FRONTEND_URL", "http://localhost:3000")
+            domain = os.environ.get("FRONTEND_URL", "https://genwear.io.vn")
             try:
                 payment_data = PaymentData(
                     orderCode=new_order.order_code,
@@ -235,7 +235,7 @@ async def create_order(
     
     checkout_url = None
     if new_order.payment_method == "payos" and payos_client:
-        domain = os.environ.get("FRONTEND_URL", "http://localhost:3000")
+        domain = os.environ.get("FRONTEND_URL", "https://genwear.io.vn")
         try:
             payos_items = [ItemData(name=item["product"].name[:250], quantity=item["quantity"], price=int(item["product"].price)) for item in items_to_process]
             payment_data = PaymentData(

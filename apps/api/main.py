@@ -77,6 +77,11 @@ _static_dir = os.path.join(os.path.dirname(__file__), "static", "blog-images")
 os.makedirs(_static_dir, exist_ok=True)
 app.mount("/static/blog-images", StaticFiles(directory=_static_dir), name="blog-images")
 
+# Serve AI-generated design images from D drive (mounted at /app/uploads)
+_uploads_dir = os.getenv("UPLOAD_DIR", "/app/uploads")
+os.makedirs(_uploads_dir, exist_ok=True)
+app.mount("/static/designs", StaticFiles(directory=_uploads_dir), name="designs")
+
 
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse

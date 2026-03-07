@@ -14,6 +14,11 @@ const nextConfig = {
         hostname: 'genwear.io.vn',
         pathname: '/static/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'api.genwear.io.vn',
+        pathname: '/static/**',
+      },
     ],
   },
 };

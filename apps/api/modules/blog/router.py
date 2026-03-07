@@ -23,7 +23,7 @@ UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "static", "blog
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 # Base URL for serving images – read from environment, fallback for local dev
-_API_BASE = os.getenv("API_BASE_URL", "http://localhost:8000")
+_API_BASE = os.getenv("API_BASE_URL", "https://api.genwear.io.vn")
 
 
 @router.post("/upload-image")
