@@ -339,23 +339,23 @@ export default function SurveyAnalyticsPage() {
             {/* Question 1 Statistics */}
             {q1Data.length > 0 && (
                 <div className="bg-slate-800/60 border border-white/10 rounded-2xl p-6">
-                    <h2 className="text-xl font-bold text-white mb-4">
+                    <h2 className="text-3xl font-bold text-white mb-6">
                         Câu hỏi 1: {data.question_titles?.question_1 || 'Câu trả lời phổ biến nhất'}
                     </h2>
-                    <ResponsiveContainer width="100%" height={400}>
+                    <ResponsiveContainer width="100%" height={450}>
                         <BarChart data={q1Data} layout="vertical">
                             <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
                             <XAxis 
                                 type="number"
                                 stroke="#94a3b8"
-                                style={{ fontSize: '12px' }}
+                                style={{ fontSize: '16px', fontWeight: '500' }}
                             />
                             <YAxis 
                                 type="category"
                                 dataKey="name" 
                                 stroke="#94a3b8"
-                                style={{ fontSize: '11px' }}
-                                width={150}
+                                style={{ fontSize: '15px', fontWeight: '500' }}
+                                width={220}
                             />
                             <Tooltip 
                                 contentStyle={{ 
@@ -383,23 +383,23 @@ export default function SurveyAnalyticsPage() {
             {/* Question 2 Statistics */}
             {q2Data.length > 0 && (
                 <div className="bg-slate-800/60 border border-white/10 rounded-2xl p-6">
-                    <h2 className="text-xl font-bold text-white mb-4">
+                    <h2 className="text-3xl font-bold text-white mb-6">
                         Câu hỏi 2: {data.question_titles?.question_2 || 'Câu trả lời phổ biến nhất'}
                     </h2>
-                    <ResponsiveContainer width="100%" height={400}>
+                    <ResponsiveContainer width="100%" height={450}>
                         <BarChart data={q2Data} layout="vertical">
                             <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
                             <XAxis 
                                 type="number"
                                 stroke="#94a3b8"
-                                style={{ fontSize: '12px' }}
+                                style={{ fontSize: '16px', fontWeight: '500' }}
                             />
                             <YAxis 
                                 type="category"
                                 dataKey="name" 
                                 stroke="#94a3b8"
-                                style={{ fontSize: '11px' }}
-                                width={150}
+                                style={{ fontSize: '15px', fontWeight: '500' }}
+                                width={220}
                             />
                             <Tooltip 
                                 contentStyle={{ 
@@ -427,23 +427,23 @@ export default function SurveyAnalyticsPage() {
             {/* Question 3 Statistics */}
             {q3Data.length > 0 && (
                 <div className="bg-slate-800/60 border border-white/10 rounded-2xl p-6">
-                    <h2 className="text-xl font-bold text-white mb-4">
+                    <h2 className="text-3xl font-bold text-white mb-6">
                         Câu hỏi 3: {data.question_titles?.question_3 || 'Câu trả lời phổ biến nhất'}
                     </h2>
-                    <ResponsiveContainer width="100%" height={400}>
+                    <ResponsiveContainer width="100%" height={450}>
                         <BarChart data={q3Data} layout="vertical">
                             <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
                             <XAxis 
                                 type="number"
                                 stroke="#94a3b8"
-                                style={{ fontSize: '12px' }}
+                                style={{ fontSize: '16px', fontWeight: '500' }}
                             />
                             <YAxis 
                                 type="category"
                                 dataKey="name" 
                                 stroke="#94a3b8"
-                                style={{ fontSize: '11px' }}
-                                width={150}
+                                style={{ fontSize: '15px', fontWeight: '500' }}
+                                width={220}
                             />
                             <Tooltip 
                                 contentStyle={{ 
