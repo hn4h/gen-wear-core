@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
 from celery import Celery
 import os
 from apps.api.modules.generation.router import router as generation_router
@@ -19,12 +21,7 @@ app = FastAPI(title="Gen Wear API", redirect_slashes=False)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://genwear.io.vn",
-        "https://www.genwear.io.vn",
-        "https://api.genwear.io.vn",
-        "http://localhost:3000",
-        "http://localhost:3001",
-        "http://127.0.0.1:3000",
+        "*",  # Allow all origins for static file access in WebGL contexts
     ],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
@@ -32,6 +29,21 @@ app.add_middleware(
     expose_headers=["*"],
     max_age=3600,
 )
+
+# Custom middleware to add additional CORS headers for static files  
+class StaticFilesCORSMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        # Ensure static files have proper CORS for WebGL/Canvas
+        if request.url.path.startswith("/static/"):
+            response.headers["Access-Control-Allow-Origin"] = "*"
+            response.headers["Access-Control-Allow-Methods"] = "GET, HEAD, OPTIONS"
+            response.headers["Access-Control-Allow-Headers"] = "*"
+            response.headers["Cross-Origin-Resource-Policy"] = "cross-origin"
+        return response
+
+# Add after CORSMiddleware (this runs first due to middleware order)
+app.add_middleware(StaticFilesCORSMiddleware)
 
 # Celery Config
 redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")

@@ -19,6 +19,13 @@ interface Preview3DModalProps {
 export function Preview3DModal({ isOpen, onClose, textureUrl, onSave }: Preview3DModalProps) {
     const modalRef = useRef<HTMLDivElement>(null);
 
+    // Debug: Log textureUrl when modal opens
+    useEffect(() => {
+        if (isOpen) {
+            console.log('[Preview3DModal] Modal opened with textureUrl:', textureUrl ? (textureUrl.startsWith('data:') ? `data URL (${textureUrl.length} chars)` : textureUrl) : 'undefined');
+        }
+    }, [isOpen, textureUrl]);
+
     // Close on escape key
     useEffect(() => {
         const handleEscape = (e: KeyboardEvent) => {

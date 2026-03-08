@@ -31,17 +31,17 @@ export const useAuthStore = create<AuthState>()(
       token: null,
       isAuthenticated: false,
       setUser: (user) => {
-        console.log('[useAuthStore.setUser] Received user:', user);
-        console.log('[useAuthStore.setUser] daily_credits_remaining:', user?.daily_credits_remaining);
+        // console.log('[useAuthStore.setUser] Received user:', user);
+        // console.log('[useAuthStore.setUser] daily_credits_remaining:', user?.daily_credits_remaining);
         set({ user, isAuthenticated: !!user });
-        console.log('[useAuthStore.setUser] Store updated');
+        // console.log('[useAuthStore.setUser] Store updated');
       },
       setToken: (token) => set({ token }),
       login: (user, token) => {
-        console.log('[useAuthStore.login] Received user:', user);
-        console.log('[useAuthStore.login] daily_credits_remaining:', user?.daily_credits_remaining);
+        // console.log('[useAuthStore.login] Received user:', user);
+        // console.log('[useAuthStore.login] daily_credits_remaining:', user?.daily_credits_remaining);
         set({ user, token, isAuthenticated: true });
-        console.log('[useAuthStore.login] Store updated');
+        // console.log('[useAuthStore.login] Store updated');
       },
       logout: () => {
         set({ user: null, token: null, isAuthenticated: false });

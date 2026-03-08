@@ -56,9 +56,9 @@ export const authAPI = {
       password: password,
     });
     
-    console.log('[authAPI.login] Response:', response.data);
-    console.log('[authAPI.login] User:', response.data.user);
-    console.log('[authAPI.login] daily_credits_remaining:', response.data.user?.daily_credits_remaining);
+        // console.log('[authAPI.login] Response:', response.data);
+        // console.log('[authAPI.login] User:', response.data.user);
+        // console.log('[authAPI.login] daily_credits_remaining:', response.data.user?.daily_credits_remaining);
     
     // Store token
     if (response.data.access_token) {
@@ -70,8 +70,8 @@ export const authAPI = {
 
   getCurrentUser: async (): Promise<User> => {
     const response = await apiClient.get<User>('/api/auth/me');
-    console.log('[authAPI.getCurrentUser] Response:', response.data);
-    console.log('[authAPI.getCurrentUser] daily_credits_remaining:', response.data?.daily_credits_remaining);
+    // console.log('[authAPI.getCurrentUser] Response:', response.data);
+    // console.log('[authAPI.getCurrentUser] daily_credits_remaining:', response.data?.daily_credits_remaining);
     return response.data;
   },
 

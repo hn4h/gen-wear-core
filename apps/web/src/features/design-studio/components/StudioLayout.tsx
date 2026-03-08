@@ -29,16 +29,16 @@ export function StudioLayout() {
             const token = getAuthToken();
             
             if (!token) {
-                console.log('[StudioLayout] No token found, redirecting to login');
+                // console.log('[StudioLayout] No token found, redirecting to login');
                 router.push("/login?redirect=/studio");
                 return;
             }
             
             try {
-                console.log('[StudioLayout] Fetching user credits...');
+                // console.log('[StudioLayout] Fetching user credits...');
                 const userData = await authAPI.getCurrentUser();
                 setUser(userData);
-                console.log('[StudioLayout] Credits loaded:', userData.daily_credits_remaining);
+                // console.log('[StudioLayout] Credits loaded:', userData.daily_credits_remaining);
             } catch (error) {
                 console.error('[StudioLayout] Failed to fetch user:', error);
                 router.push("/login?redirect=/studio");
@@ -185,15 +185,15 @@ export function StudioLayout() {
                 />
             </div>
 
-            {/* 3D Preview Modal */}
-            {displayedImage && (
+            {/* 3D Preview Modal - Temporarily disabled */}
+            {/* {displayedImage && (
                 <Preview3DModal
                     isOpen={show3DPreview}
                     onClose={() => setShow3DPreview(false)}
                     textureUrl={displayedImage}
                     onSave={handleSaveDesign}
                 />
-            )}
+            )} */}
         </div>
     );
 }

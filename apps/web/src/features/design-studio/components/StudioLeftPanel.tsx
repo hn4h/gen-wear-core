@@ -73,15 +73,15 @@ export function StudioLeftPanel({
 }: StudioLeftPanelProps) {
     const { user } = useAuthStore();
     
-    console.log('[StudioLeftPanel] Current user:', user);
-    console.log('[StudioLeftPanel] daily_credits_remaining:', user?.daily_credits_remaining);
+    // console.log('[StudioLeftPanel] Current user:', user);
+    // console.log('[StudioLeftPanel] daily_credits_remaining:', user?.daily_credits_remaining);
     
     const canGenerate = designPrompt.trim().length > 0 && !isGenerating;
     const canApplyEdit = hasImage && hasMask && editPrompt.trim().length > 0 && !isApplying;
     const isFreeTier = !user || user.account_tier === "FREE" || user.account_tier === undefined;
     const isOutOfCredits = user?.daily_credits_remaining !== undefined && user.daily_credits_remaining <= 0;
     
-    console.log('[StudioLeftPanel] isOutOfCredits:', isOutOfCredits);
+    // console.log('[StudioLeftPanel] isOutOfCredits:', isOutOfCredits);
 
     return (
         <div className="w-full lg:w-[400px] flex-shrink-0 bg-slate-800/50 backdrop-blur-sm border-r border-white/10 flex flex-col">
@@ -277,13 +277,14 @@ export function StudioLeftPanel({
 
                         {/* Complete Section */}
                         <div className="p-6 space-y-3">
-                            <button
+                            {/* 3D Preview - Temporarily disabled due to CORS issues */}
+                            {/* <button
                                 onClick={onComplete}
                                 className="w-full py-3 px-6 rounded-xl border-2 border-emerald-500 text-emerald-400 font-semibold hover:bg-emerald-500/10 transition-all duration-200 flex items-center justify-center gap-2"
                             >
                                 <EyeIcon className="w-5 h-5" />
                                 Xem trước 3D
-                            </button>
+                            </button> */}
                             
                             {/* Order Design Button */}
                             <button

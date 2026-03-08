@@ -43,7 +43,7 @@ export function useDesignGeneration(): UseDesignGenerationReturn {
         setGeneratedPrompt("");
 
         try {
-            console.log("[useDesignGeneration] Calling API:", `${API_URL}/api/generation`);
+            // console.log("[useDesignGeneration] Calling API:", `${API_URL}/api/generation`);
             const response = await fetch(`${API_URL}/api/generation`, {
                 method: "POST",
                 headers: {
@@ -53,7 +53,7 @@ export function useDesignGeneration(): UseDesignGenerationReturn {
                 body: JSON.stringify({ prompt }),
             });
 
-            console.log("[useDesignGeneration] Response status:", response.status);
+            // console.log("[useDesignGeneration] Response status:", response.status);
 
             if (!response.ok) {
                 const errorText = await response.text();
@@ -72,11 +72,11 @@ export function useDesignGeneration(): UseDesignGenerationReturn {
             }
 
             const data: GenResponse = await response.json();
-            console.log("[useDesignGeneration] data keys:", Object.keys(data));
-            console.log("[useDesignGeneration] data.url length:", data.url?.length ?? "undefined");
+            // console.log("[useDesignGeneration] data keys:", Object.keys(data));
+            // console.log("[useDesignGeneration] data.url length:", data.url?.length ?? "undefined");
 
             if (data.url) {
-                console.log("[useDesignGeneration] Setting textureUrl, prefix:", data.url.slice(0, 30));
+                // console.log("[useDesignGeneration] Setting textureUrl, prefix:", data.url.slice(0, 30));
                 setTextureUrl(data.url);
                 toast.success("Tạo thiết kế thành công!");
                 
