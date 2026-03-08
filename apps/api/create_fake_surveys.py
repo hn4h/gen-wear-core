@@ -21,23 +21,26 @@ DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://genwear:password@localhos
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(bind=engine)
 
-# Câu trả lời mẫu
+# Câu trả lời mẫu từ PostGenerationSurvey.tsx
+# Q1: Trải nghiệm tổng thể từ thiết kế → thanh toán
 QUESTION_1_OPTIONS = [
     'Rất dễ sử dụng, mượt mà',
     'Khá dễ sử dụng',
     'Bình thường',
     'Hơi khó thao tác ở một số bước',
-    'Khó sử dụng, cần hướng dẫn chi tiết'
+    'Khó sử dụng / cần cải thiện nhiều'
 ]
 
+# Q2: Phiên bản Free và Pro
 QUESTION_2_OPTIONS = [
-    'Rất hài lòng, vượt mong đợi',
-    'Hài lòng',
-    'Bình thường',
-    'Chưa đáp ứng kỳ vọng',
-    'Không hài lòng'
+    'Phiên bản Free đã đủ dùng với tôi',
+    'Tôi sẵn sàng nâng cấp Pro để có thêm tính năng',
+    'Tôi thấy ổn nhưng muốn thêm gói khác (ví dụ gói trung cấp)',
+    'Tôi chưa hiểu rõ sự khác nhau giữa Free và Pro',
+    'Ý kiến khác'
 ]
 
+# Q3: Đánh giá về website GenWear
 QUESTION_3_OPTIONS = [
     'Rất ấn tượng và sáng tạo',
     'Giao diện đẹp, dễ dùng',
@@ -46,40 +49,49 @@ QUESTION_3_OPTIONS = [
     'Cần cải thiện thêm'
 ]
 
+# Q4: Mức độ hài lòng với thiết kế đã tạo (mapping to rating)
 QUESTION_4_OPTIONS = [
-    'Rất đẹp và sáng tạo',
-    'Đẹp, có tính nghệ thuật',
-    'Khá ổn, dùng được',
-    'Chưa thật sự nổi bật',
-    'Cần chỉnh sửa thêm để đúng ý hơn'
+    'Rất đẹp và sáng tạo',        # Rating 5
+    'Đẹp, có tính nghệ thuật',    # Rating 4
+    'Khá ổn, dùng được',          # Rating 3
+    'Chưa thật sự nổi bật',       # Rating 2
+    'Cần chỉnh sửa thêm để đúng ý hơn'  # Rating 1
 ]
 
+# Q5: Nếu GenWear có thể cải thiện thêm (feedback)
 FEEDBACK_OPTIONS = [
     'Nhiều mẫu / template hơn',
     'Có thêm bộ sưu tập thiết kế sẵn (BST) theo chủ đề',
     'Công cụ custom mạnh hơn',
     'Giá tốt hơn / ưu đãi nhiều hơn',
     'Thanh toán nhanh và đơn giản hơn',
-    'Tôi đã hài lòng, chưa cần cải thiện gì',
-    'Tốc độ gen nhanh hơn',
-    'Chất lượng hình ảnh AI tốt hơn',
-    'Thêm nhiều kiểu thiết kế khác (áo, mũ, túi...)',
-    'Giao diện đẹp hơn, hiện đại hơn'
+    'Tôi đã hài lòng, chưa cần cải thiện gì'
 ]
 
-# Rating distribution (weighted)
+# Rating distribution (weighted) - tương ứng với Q4
 RATING_WEIGHTS = [
-    (5, 40),  # 40% cho 5 sao
-    (4, 35),  # 35% cho 4 sao
-    (3, 15),  # 15% cho 3 sao
-    (2, 7),   # 7% cho 2 sao
-    (1, 3)    # 3% cho 1 sao
+    (5, 28),  # 28% cho 5 sao (Rất đẹp và sáng tạo)
+    (4, 36),  # 36% cho 4 sao (Đẹp, có tính nghệ thuật)
+    (3, 20),  # 20% cho 3 sao (Khá ổn, dùng được)
+    (2, 12),  # 12% cho 2 sao (Chưa thật sự nổi bật)
+    (1, 4)    # 4% cho 1 sao (Cần chỉnh sửa thêm)
 ]
 
 def get_weighted_rating():
     """Lấy rating ngẫu nhiên theo trọng số"""
     ratings, weights = zip(*RATING_WEIGHTS)
     return random.choices(ratings, weights=weights)[0]
+
+def get_q4_answer_for_rating(rating):
+    """Map rating → câu trả lời Q4 (mức độ hài lòng với thiết kế)"""
+    mapping = {
+        5: 'Rất đẹp và sáng tạo',
+        4: 'Đẹp, có tính nghệ thuật',
+        3: 'Khá ổn, dùng được',
+        2: 'Chưa thật sự nổi bật',
+        1: 'Cần chỉnh sửa thêm để đúng ý hơn'
+    }
+    return mapping.get(rating, QUESTION_4_OPTIONS[2])
 
 def random_datetime_between(start_date, end_date):
     """Tạo datetime ngẫu nhiên giữa 2 ngày"""
@@ -141,9 +153,9 @@ def create_fake_surveys():
             q1 = random.choice(QUESTION_1_OPTIONS)
             q2 = random.choice(QUESTION_2_OPTIONS)
             q3 = random.choice(QUESTION_3_OPTIONS)
-            q4 = random.choice(QUESTION_4_OPTIONS)
-            feedback = random.choice(FEEDBACK_OPTIONS)
             rating = get_weighted_rating()
+            q4 = get_q4_answer_for_rating(rating)  # Q4 phải match với rating
+            feedback = random.choice(FEEDBACK_OPTIONS)
             
             # Tạo survey response
             survey = SurveyResponse(
