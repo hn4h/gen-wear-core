@@ -8,6 +8,12 @@ import { authAPI } from '@/src/services/auth';
 import { useAuthStore } from '@/src/lib/useAuthStore';
 import { Eye, EyeOff, Phone, Lock, Loader2 } from 'lucide-react';
 
+const EyeIcon = Eye as any;
+const EyeOffIcon = EyeOff as any;
+const PhoneIcon = Phone as any;
+const LockIcon = Lock as any;
+const Loader2Icon = Loader2 as any;
+
 export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuthStore();
@@ -107,7 +113,7 @@ export default function LoginPage() {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Phone className="h-5 w-5 text-gray-400" />
+                  <PhoneIcon className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
                   type="tel"
@@ -127,7 +133,7 @@ export default function LoginPage() {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400" />
+                  <LockIcon className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
                   type={showPassword ? 'text' : 'password'}
@@ -142,7 +148,7 @@ export default function LoginPage() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-white transition-colors"
                 >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  {showPassword ? <EyeOffIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
                 </button>
               </div>
             </div>
@@ -155,7 +161,7 @@ export default function LoginPage() {
             >
               {loading ? (
                 <>
-                  <Loader2 className="h-5 w-5 animate-spin" />
+                  <Loader2Icon className="h-5 w-5 animate-spin" />
                   Đang đăng nhập...
                 </>
               ) : (

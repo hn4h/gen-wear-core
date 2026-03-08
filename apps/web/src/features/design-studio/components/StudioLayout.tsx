@@ -12,6 +12,7 @@ import { useDesignOrderStore } from "@/src/lib/useDesignOrderStore";
 import { designsAPI } from "@/src/services/designs";
 import { getAuthToken, useAuthStore } from "@/src/lib/useAuthStore";
 import { authAPI } from "@/src/services/auth";
+import { PostGenerationSurvey } from "./PostGenerationSurvey";
 
 export function StudioLayout() {
     const router = useRouter();
@@ -22,6 +23,7 @@ export function StudioLayout() {
     const [maskBase64, setMaskBase64] = useState<string | null>(null);
     const [isSaving, setIsSaving] = useState(false);
     const [isLoadingCredits, setIsLoadingCredits] = useState(true);
+    const [showSurvey, setShowSurvey] = useState(false);
     
     // Check auth and fetch credits on mount
     useEffect(() => {
@@ -83,6 +85,8 @@ export function StudioLayout() {
             return;
         }
         await generatePattern();
+        // Show survey modal after AI completes successfully
+        setShowSurvey(true);
     }, [generatePattern, router]);
 
     // editedImageUrl takes priority over textureUrl (original generated)
@@ -194,6 +198,12 @@ export function StudioLayout() {
                     onSave={handleSaveDesign}
                 />
             )} */}
+
+            {/* Post-Generation Survey Modal */}
+            <PostGenerationSurvey 
+                isOpen={showSurvey} 
+                onClose={() => setShowSurvey(false)} 
+            />
         </div>
     );
 }

@@ -8,6 +8,14 @@ import { authAPI } from '@/src/services/auth';
 import { useAuthStore } from '@/src/lib/useAuthStore';
 import { Eye, EyeOff, Phone, User, Lock, Loader2, CheckCircle } from 'lucide-react';
 
+const EyeIcon = Eye as any;
+const EyeOffIcon = EyeOff as any;
+const PhoneIcon = Phone as any;
+const LockIcon = Lock as any;
+const Loader2Icon = Loader2 as any;
+const UserIcon = User as any;
+const CheckCircleIcon = CheckCircle as any;
+
 export default function RegisterPage() {
   const router = useRouter();
   const { login } = useAuthStore();
@@ -142,7 +150,7 @@ export default function RegisterPage() {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Phone className="h-5 w-5 text-gray-400" />
+                  <PhoneIcon className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
                   type="tel"
@@ -162,7 +170,7 @@ export default function RegisterPage() {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <User className="h-5 w-5 text-gray-400" />
+                  <UserIcon className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
                   type="text"
@@ -182,7 +190,7 @@ export default function RegisterPage() {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400" />
+                  <LockIcon className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
                   type={showPassword ? 'text' : 'password'}
@@ -197,7 +205,7 @@ export default function RegisterPage() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-white transition-colors"
                 >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  {showPassword ? <EyeOffIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
                 </button>
               </div>
               
@@ -222,7 +230,7 @@ export default function RegisterPage() {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400" />
+                  <LockIcon className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
                   type={showConfirmPassword ? 'text' : 'password'}
@@ -237,12 +245,12 @@ export default function RegisterPage() {
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-white transition-colors"
                 >
-                  {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  {showConfirmPassword ? <EyeOffIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
                 </button>
               </div>
               {confirmPassword && password === confirmPassword && (
                 <div className="mt-2 flex items-center gap-1 text-green-400 text-sm">
-                  <CheckCircle className="h-4 w-4" />
+                  <CheckCircleIcon className="h-4 w-4" />
                   <span>Mật khẩu khớp</span>
                 </div>
               )}
@@ -256,7 +264,7 @@ export default function RegisterPage() {
             >
               {loading ? (
                 <>
-                  <Loader2 className="h-5 w-5 animate-spin" />
+                  <Loader2Icon className="h-5 w-5 animate-spin" />
                   Đang đăng ký...
                 </>
               ) : (

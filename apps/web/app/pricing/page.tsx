@@ -1,6 +1,16 @@
 'use client';
 
 import { Check, X, Sparkles, Zap, Shield, Image as ImageIcon, Loader2, Crown } from "lucide-react";
+
+const CheckIcon = Check as any;
+const XIcon = X as any;
+const SparklesIcon = Sparkles as any;
+const ZapIcon = Zap as any;
+const ShieldIcon = Shield as any;
+const Loader2Icon = Loader2 as any;
+const CrownIcon = Crown as any;
+const ImageIconType = ImageIcon as any;
+
 import { Header } from "@/src/components/layout/Header";
 import { Footer } from "@/src/components/layout/Footer";
 import Link from "next/link";
@@ -163,27 +173,27 @@ export default function PricingPage() {
                                 </p>
                                 <ul role="list" className="mt-8 space-y-3 text-sm leading-6 text-slate-300">
                                     <li className="flex gap-x-3 items-center">
-                                        <Check className="h-5 w-5 flex-none text-purple-400" aria-hidden="true" />
+                                        <CheckIcon className="h-5 w-5 flex-none text-purple-400" aria-hidden="true" />
                                         <span><strong className="text-white">5 Credits</strong> mỗi ngày</span>
                                     </li>
                                     <li className="flex gap-x-3 items-center">
-                                        <Check className="h-5 w-5 flex-none text-purple-400" aria-hidden="true" />
+                                        <CheckIcon className="h-5 w-5 flex-none text-purple-400" aria-hidden="true" />
                                         <span>Độ phân giải tiêu chuẩn (1K)</span>
                                     </li>
                                     <li className="flex gap-x-3 items-center">
-                                        <Check className="h-5 w-5 flex-none text-purple-400" aria-hidden="true" />
+                                        <CheckIcon className="h-5 w-5 flex-none text-purple-400" aria-hidden="true" />
                                         <span>Tạo ảnh cơ bản từ văn bản</span>
                                     </li>
                                     <li className="flex gap-x-3 items-center text-slate-500">
-                                        <X className="h-5 w-5 flex-none" aria-hidden="true" />
+                                        <XIcon className="h-5 w-5 flex-none" aria-hidden="true" />
                                         <span className="line-through">Không có dấu bản quyền (Watermark)</span>
                                     </li>
                                     <li className="flex gap-x-3 items-center text-slate-500">
-                                        <X className="h-5 w-5 flex-none" aria-hidden="true" />
+                                        <XIcon className="h-5 w-5 flex-none" aria-hidden="true" />
                                         <span className="line-through">Chỉnh sửa vùng (Inpainting)</span>
                                     </li>
                                     <li className="flex gap-x-3 items-center text-slate-500">
-                                        <X className="h-5 w-5 flex-none" aria-hidden="true" />
+                                        <XIcon className="h-5 w-5 flex-none" aria-hidden="true" />
                                         <span className="line-through">Hàng đợi AI ưu tiên</span>
                                     </li>
                                 </ul>
@@ -204,7 +214,7 @@ export default function PricingPage() {
                             <div className="relative z-10">
                                 <div className="flex items-center justify-between gap-x-4">
                                     <h3 className="flex items-center gap-2 text-2xl font-semibold leading-8 text-white">
-                                        <Sparkles className="h-6 w-6 text-pink-400" />
+                                        <SparklesIcon className="h-6 w-6 text-pink-400" />
                                         Pro
                                     </h3>
                                     <span className="rounded-full bg-purple-500/20 px-3 py-1 text-xs font-semibold leading-5 text-purple-300 ring-1 ring-inset ring-purple-500/30 shadow-[0_0_10px_rgba(168,85,247,0.2)]">
@@ -222,31 +232,31 @@ export default function PricingPage() {
                                 
                                 <ul role="list" className="mt-8 space-y-3 text-sm leading-6 text-slate-200">
                                     <li className="flex gap-x-3 items-center">
-                                        <Check className="h-5 w-5 flex-none text-purple-400 drop-shadow-[0_0_8px_rgba(168,85,247,0.5)]" aria-hidden="true" />
+                                        <CheckIcon className="h-5 w-5 flex-none text-purple-400 drop-shadow-[0_0_8px_rgba(168,85,247,0.5)]" aria-hidden="true" />
                                         <span><strong className="text-white">20 credits miễn phí</strong> mỗi ngày</span>
                                     </li>
                                     <li className="flex gap-x-3 items-center">
-                                        <Check className="h-5 w-5 flex-none text-purple-400 drop-shadow-[0_0_8px_rgba(168,85,247,0.5)]" aria-hidden="true" />
+                                        <CheckIcon className="h-5 w-5 flex-none text-purple-400 drop-shadow-[0_0_8px_rgba(168,85,247,0.5)]" aria-hidden="true" />
                                         <span>Mở khóa <strong className="text-white">Full toàn bộ tính năng</strong></span>
                                     </li>
                                     <li className="flex gap-x-3 items-center">
-                                        <Zap className="h-5 w-5 flex-none text-purple-400" aria-hidden="true" />
+                                        <ZapIcon className="h-5 w-5 flex-none text-purple-400" aria-hidden="true" />
                                         <span>Độ phân giải siêu nét (Hỗ trợ <strong className="text-white">2K, 4K</strong>)</span>
                                     </li>
                                     <li className="flex gap-x-3 items-center">
-                                        <Shield className="h-5 w-5 flex-none text-purple-400" aria-hidden="true" />
+                                        <ShieldIcon className="h-5 w-5 flex-none text-purple-400" aria-hidden="true" />
                                         <span>Hoàn toàn <strong className="text-white">không có dấu bản quyền</strong></span>
                                     </li>
                                     <li className="flex gap-x-3 items-center">
-                                        <ImageIcon className="h-5 w-5 flex-none text-purple-400" aria-hidden="true" />
+                                        <ImageIconType className="h-5 w-5 flex-none text-purple-400" aria-hidden="true" />
                                         <span>Hỗ trợ <strong className="text-white">Chỉnh sửa vùng ảnh</strong> (Inpainting) chuyên sâu</span>
                                     </li>
                                     <li className="flex gap-x-3 items-center">
-                                        <Check className="h-5 w-5 flex-none text-purple-400" aria-hidden="true" />
+                                        <CheckIcon className="h-5 w-5 flex-none text-purple-400" aria-hidden="true" />
                                         <span>Máy chủ cấu hình cao, tạo ảnh được ưu tiên</span>
                                     </li>
                                     <li className="flex gap-x-3 items-center">
-                                        <Crown className="h-5 w-5 flex-none text-purple-400" aria-hidden="true" />
+                                        <CrownIcon className="h-5 w-5 flex-none text-purple-400" aria-hidden="true" />
                                         <span>Có thể <strong className="text-white">mua thêm gói credits</strong> không giới hạn</span>
                                     </li>
                                 </ul>
@@ -258,7 +268,7 @@ export default function PricingPage() {
                             >
                                 {isProcessing ? (
                                     <>
-                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                        <Loader2Icon className="w-5 h-5 animate-spin" />
                                         Đang tạo...
                                     </>
                                 ) : (
@@ -292,31 +302,31 @@ export default function PricingPage() {
                                 
                                 <ul role="list" className="mt-8 space-y-3 text-sm leading-6 text-slate-200">
                                     <li className="flex gap-x-3 items-center">
-                                        <Check className="h-5 w-5 flex-none text-orange-400 drop-shadow-[0_0_8px_rgba(249,115,22,0.5)]" aria-hidden="true" />
+                                        <CheckIcon className="h-5 w-5 flex-none text-orange-400 drop-shadow-[0_0_8px_rgba(249,115,22,0.5)]" aria-hidden="true" />
                                         <span><strong className="text-white">100 credits miễn phí</strong> mỗi ngày</span>
                                     </li>
                                     <li className="flex gap-x-3 items-center">
-                                        <Zap className="h-5 w-5 flex-none text-orange-400" aria-hidden="true" />
+                                        <ZapIcon className="h-5 w-5 flex-none text-orange-400" aria-hidden="true" />
                                         <span>Render <strong className="text-white">tốc độ cao nhất</strong></span>
                                     </li>
                                     <li className="flex gap-x-3 items-center">
-                                        <Check className="h-5 w-5 flex-none text-orange-400 drop-shadow-[0_0_8px_rgba(249,115,22,0.5)]" aria-hidden="true" />
+                                        <CheckIcon className="h-5 w-5 flex-none text-orange-400 drop-shadow-[0_0_8px_rgba(249,115,22,0.5)]" aria-hidden="true" />
                                         <span>Upscale <strong className="text-white">8K siêu nét</strong></span>
                                     </li>
                                     <li className="flex gap-x-3 items-center">
-                                        <ImageIcon className="h-5 w-5 flex-none text-orange-400" aria-hidden="true" />
+                                        <ImageIconType className="h-5 w-5 flex-none text-orange-400" aria-hidden="true" />
                                         <span><strong className="text-white">Outpainting & Remove Object AI</strong></span>
                                     </li>
                                     <li className="flex gap-x-3 items-center">
-                                        <Check className="h-5 w-5 flex-none text-orange-400" aria-hidden="true" />
+                                        <CheckIcon className="h-5 w-5 flex-none text-orange-400" aria-hidden="true" />
                                         <span>Lưu <strong className="text-white">prompt & workflow</strong></span>
                                     </li>
                                     <li className="flex gap-x-3 items-center">
-                                        <Sparkles className="h-5 w-5 flex-none text-orange-400" aria-hidden="true" />
+                                        <SparklesIcon className="h-5 w-5 flex-none text-orange-400" aria-hidden="true" />
                                         <span>Truy cập <strong className="text-white">AI model mới sớm nhất</strong></span>
                                     </li>
                                     <li className="flex gap-x-3 items-center">
-                                        <Crown className="h-5 w-5 flex-none text-orange-400" aria-hidden="true" />
+                                        <CrownIcon className="h-5 w-5 flex-none text-orange-400" aria-hidden="true" />
                                         <span>Toàn bộ tính năng <strong className="text-white">Pro + Advanced</strong></span>
                                     </li>
                                 </ul>
@@ -328,7 +338,7 @@ export default function PricingPage() {
                             >
                                 {isProcessing ? (
                                     <>
-                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                        <Loader2Icon className="w-5 h-5 animate-spin" />
                                         Đang tạo...
                                     </>
                                 ) : (
@@ -359,19 +369,19 @@ export default function PricingPage() {
                                             </p>
                                             <div className="flex flex-wrap gap-4 text-sm">
                                                 <div className="flex items-center gap-2">
-                                                    <Zap className="h-4 w-4 text-orange-400" />
+                                                    <ZapIcon className="h-4 w-4 text-orange-400" />
                                                     <span className="text-slate-200">Render siêu nhanh</span>
                                                 </div>
                                                 <div className="flex items-center gap-2">
-                                                    <Check className="h-4 w-4 text-orange-400" />
+                                                    <CheckIcon className="h-4 w-4 text-orange-400" />
                                                     <span className="text-slate-200">Upscale 8K</span>
                                                 </div>
                                                 <div className="flex items-center gap-2">
-                                                    <ImageIcon className="h-4 w-4 text-orange-400" />
+                                                    <ImageIconType className="h-4 w-4 text-orange-400" />
                                                     <span className="text-slate-200">AI Tools nâng cao</span>
                                                 </div>
                                                 <div className="flex items-center gap-2">
-                                                    <Sparkles className="h-4 w-4 text-orange-400" />
+                                                    <SparklesIcon className="h-4 w-4 text-orange-400" />
                                                     <span className="text-slate-200">AI model mới nhất</span>
                                                 </div>
                                             </div>
@@ -388,7 +398,7 @@ export default function PricingPage() {
                                             >
                                                 {isProcessing ? (
                                                     <>
-                                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                                        <Loader2Icon className="w-5 h-5 animate-spin" />
                                                         Đang xử lý...
                                                     </>
                                                 ) : (
@@ -408,7 +418,7 @@ export default function PricingPage() {
                             
                             {loadingPackages ? (
                                 <div className="flex justify-center items-center py-20">
-                                    <Loader2 className="w-8 h-8 animate-spin text-purple-400" />
+                                    <Loader2Icon className="w-8 h-8 animate-spin text-purple-400" />
                                 </div>
                             ) : (
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -434,15 +444,15 @@ export default function PricingPage() {
                                                 </p>
                                                 <ul className="space-y-2 text-sm text-slate-300">
                                                     <li className="flex items-center gap-2">
-                                                        <Check className="h-4 w-4 text-purple-400" />
+                                                        <CheckIcon className="h-4 w-4 text-purple-400" />
                                                         <span>{pkg.credits} lượt tạo ảnh</span>
                                                     </li>
                                                     <li className="flex items-center gap-2">
-                                                        <Check className="h-4 w-4 text-purple-400" />
+                                                        <CheckIcon className="h-4 w-4 text-purple-400" />
                                                         <span>Không giới hạn độ phân giải</span>
                                                     </li>
                                                     <li className="flex items-center gap-2">
-                                                        <Check className="h-4 w-4 text-purple-400" />
+                                                        <CheckIcon className="h-4 w-4 text-purple-400" />
                                                         <span>Không có watermark</span>
                                                     </li>
                                                 </ul>
@@ -454,7 +464,7 @@ export default function PricingPage() {
                                             >
                                                 {isProcessing ? (
                                                     <>
-                                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                                        <Loader2Icon className="w-4 h-4 animate-spin" />
                                                         Đang xử lý...
                                                     </>
                                                 ) : (
@@ -477,14 +487,14 @@ export default function PricingPage() {
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left text-sm">
                                 <div>
                                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-pink-500/10 ring-1 ring-pink-500/20 mb-4">
-                                        <Zap className="h-5 w-5 text-pink-400 flex-shrink-0" />
+                                        <ZapIcon className="h-5 w-5 text-pink-400 flex-shrink-0" />
                                     </div>
                                     <h4 className="font-semibold text-white mb-2">Chi phí thực thi AI</h4>
                                     <p className="text-slate-400">Mỗi yêu cầu tạo mẫu thiết kế hoặc chỉnh sửa chi tiết sẽ sử dụng 1 credit trên hệ thống.</p>
                                 </div>
                                 <div>
                                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-500/10 ring-1 ring-purple-500/20 mb-4">
-                                        <Check className="h-5 w-5 text-purple-400 flex-shrink-0" />
+                                        <CheckIcon className="h-5 w-5 text-purple-400 flex-shrink-0" />
                                     </div>
                                     <h4 className="font-semibold text-white mb-2">Credits miễn phí</h4>
                                     <p className="text-slate-400">
@@ -496,7 +506,7 @@ export default function PricingPage() {
                                 </div>
                                 <div>
                                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-500/10 ring-1 ring-purple-500/20 mb-4">
-                                        <Shield className="h-5 w-5 text-purple-400 flex-shrink-0" />
+                                        <ShieldIcon className="h-5 w-5 text-purple-400 flex-shrink-0" />
                                     </div>
                                     <h4 className="font-semibold text-white mb-2">Quyền lợi Pro</h4>
                                     <p className="text-slate-400">

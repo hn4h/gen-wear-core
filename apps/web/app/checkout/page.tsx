@@ -21,7 +21,11 @@ const PlusIcon = Plus as any;
 
 const DESIGN_PRICE = 150000;
 
-export default function CheckoutPage() {
+import { Suspense } from 'react';
+
+// ... (other code)
+
+function CheckoutContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const isDesignOrder = searchParams.get('type') === 'design';
@@ -417,5 +421,17 @@ export default function CheckoutPage() {
             
             <Footer />
         </div>
+    );
+}
+
+export default function CheckoutPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+                <Loader2Icon className="w-8 h-8 animate-spin text-purple-500" />
+            </div>
+        }>
+            <CheckoutContent />
+        </Suspense>
     );
 }
