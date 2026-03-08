@@ -77,6 +77,16 @@ class UpgradeToProResponse(BaseModel):
     amount: int
     description: str
 
+class UpgradeToUltraRequest(BaseModel):
+    return_url: str = Field(..., description="URL to redirect after payment success")
+    cancel_url: str = Field(..., description="URL to redirect if payment is cancelled")
+
+class UpgradeToUltraResponse(BaseModel):
+    checkout_url: str
+    order_code: str
+    amount: int
+    description: str
+
 class SubscriptionStatusResponse(BaseModel):
     account_tier: str
     subscription_status: str
