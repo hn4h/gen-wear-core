@@ -50,7 +50,7 @@ function CheckoutContent() {
         email: '',
         address: '',
         city: '',
-        paymentMethod: 'cod'
+        paymentMethod: 'payos'
     });
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -279,7 +279,6 @@ function CheckoutContent() {
                                             onChange={handleInputChange}
                                             className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
                                         >
-                                            <option value="cod">Thanh toán khi nhận hàng (COD)</option>
                                             <option value="bank">Chuyển khoản trực tiếp</option>
                                             <option value="payos">Thanh toán an toàn qua PayOS (QR Code)</option>
                                         </select>

@@ -27,7 +27,7 @@ class CreateOrderRequest(BaseModel):
     email: str
     address: str
     city: str
-    payment_method: str = "cod"
+    payment_method: str = "payos"
     items: Optional[List[OrderItemBase]] = None # Optional: If not provided, use cart
     # Custom AI Design Order fields
     custom_design_url: Optional[str] = None

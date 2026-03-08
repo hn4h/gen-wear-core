@@ -27,7 +27,7 @@ class Order(Base):
     city = Column(String, nullable=False)
     
     # Payment Info
-    payment_method = Column(String, default="cod")
+    payment_method = Column(String, default="payos")
     
     # Custom design notes (for AI design orders)
     custom_notes = Column(String, nullable=True)
