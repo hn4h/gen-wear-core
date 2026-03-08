@@ -5,8 +5,11 @@ from apps.api.modules.auth.database import get_db
 from apps.api.modules.auth.service import get_current_admin_user
 from apps.api.modules.auth.models import User
 from apps.api.modules.auth.schemas import UserResponse
+from apps.api.modules.survey.models import SurveyResponse
+from apps.api.modules.survey.schemas import SurveyResponseDetail, SurveyListResponse
 from pydantic import BaseModel, Field
 from datetime import datetime, timedelta
+import math
 
 router = APIRouter()
 
@@ -39,7 +42,6 @@ async def list_users(
     offset = (page - 1) * page_size
     users = query.offset(offset).limit(page_size).all()
     
-    import math
     total_pages = math.ceil(total / page_size) if total > 0 else 0
     
     return UserListResponse(
@@ -101,10 +103,13 @@ async def get_stats(
     from apps.api.modules.designs.models import SavedDesign
     from apps.api.modules.blog.models import BlogPost, BlogComment, BlogLike
     from apps.api.modules.generation.models import AIGenerationLog
+    from apps.api.modules.survey.models import SurveyResponse
 
     now = datetime.utcnow()
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
     period_start = now - timedelta(days=days - 1)
+    period_7_days = now - timedelta(days=7)
+    period_30_days = now - timedelta(days=30)
 
     # ── Users ──────────────
     total_users = db.query(func.count(User.id)).scalar() or 0
@@ -144,6 +149,19 @@ async def get_stats(
     total_blog_posts = db.query(func.count(BlogPost.id)).scalar() or 0
     total_comments = db.query(func.count(BlogComment.id)).scalar() or 0
     total_likes = db.query(func.count(BlogLike.post_id)).scalar() or 0
+
+    # ── Survey ──────────────
+    total_survey_responses = db.query(func.count(SurveyResponse.id)).scalar() or 0
+    survey_last_7_days = db.query(func.count(SurveyResponse.id)).filter(
+        SurveyResponse.created_at >= period_7_days
+    ).scalar() or 0
+    survey_last_30_days = db.query(func.count(SurveyResponse.id)).filter(
+        SurveyResponse.created_at >= period_30_days
+    ).scalar() or 0
+    avg_rating = db.query(func.avg(SurveyResponse.rating)).filter(
+        SurveyResponse.rating.isnot(None)
+    ).scalar()
+    avg_rating = round(float(avg_rating), 2) if avg_rating else None
 
     # ── Time-series: grouped daily ──────────────
     def build_chart(rows, label_col='day', count_col='count'):
@@ -199,6 +217,10 @@ async def get_stats(
         "total_blog_posts": total_blog_posts,
         "total_comments": total_comments,
         "total_likes": total_likes,
+        "total_survey_responses": total_survey_responses,
+        "survey_last_7_days": survey_last_7_days,
+        "survey_last_30_days": survey_last_30_days,
+        "avg_survey_rating": avg_rating,
         # Chart time-series
         "chart_days": day_labels,
         "chart_new_users": [user_chart.get(d, 0) for d in day_labels],
@@ -210,3 +232,75 @@ async def get_stats(
         "period_days": days,
     }
 
+
+# ─── Survey Management Endpoints ────────────────────────────────────────────────
+
+@router.get("/surveys", response_model=SurveyListResponse)
+async def list_survey_responses(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=100),
+    min_rating: int = Query(None, ge=1, le=5),
+    db: Session = Depends(get_db),
+    admin: User = Depends(get_current_admin_user)
+):
+    """List all survey responses with user details (Admin only)"""
+    query = db.query(SurveyResponse).join(
+        User, SurveyResponse.user_id == User.id, isouter=True
+    )
+    
+    # Filter by rating if provided
+    if min_rating:
+        query = query.filter(SurveyResponse.rating >= min_rating)
+    
+    # Order by newest first
+    query = query.order_by(SurveyResponse.created_at.desc())
+    
+    total = query.count()
+    offset = (page - 1) * page_size
+    responses = query.offset(offset).limit(page_size).all()
+    
+    total_pages = math.ceil(total / page_size) if total > 0 else 0
+    
+    # Build response with user details
+    response_list = []
+    for resp in responses:
+        user = db.query(User).filter(User.id == resp.user_id).first() if resp.user_id else None
+        response_list.append(
+            SurveyResponseDetail(
+                id=resp.id,
+                survey_id=resp.survey_id,
+                user_id=resp.user_id,
+                question_1_answer=resp.question_1_answer,
+                question_2_answer=resp.question_2_answer,
+                question_3_answer=resp.question_3_answer,
+                rating=resp.rating,
+                feedback=resp.feedback,
+                created_at=resp.created_at,
+                user_name=user.full_name if user else "Anonymous",
+                user_phone=user.phone_number if user else None,
+                user_email=None  # User model doesn't have email field
+            )
+        )
+    
+    return SurveyListResponse(
+        responses=response_list,
+        total=total,
+        page=page,
+        page_size=page_size,
+        total_pages=total_pages
+    )
+
+
+@router.delete("/surveys/{response_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_survey_response(
+    response_id: str,
+    db: Session = Depends(get_db),
+    admin: User = Depends(get_current_admin_user)
+):
+    """Delete a survey response (Admin only)"""
+    response = db.query(SurveyResponse).filter(SurveyResponse.id == response_id).first()
+    if not response:
+        raise HTTPException(status_code=404, detail="Survey response not found")
+    
+    db.delete(response)
+    db.commit()

@@ -1,9 +1,13 @@
 import { useState, useEffect } from 'react';
 import { X, CheckCircle2, MessageSquarePlus } from 'lucide-react';
+import axios from 'axios';
+import { getAuthToken } from '@/src/lib/useAuthStore';
 
 const XIcon = X as any;
 const CheckCircle2Icon = CheckCircle2 as any;
 const MessageSquarePlusIcon = MessageSquarePlus as any;
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.genwear.io.vn';
 
 interface PostGenerationSurveyProps {
     isOpen: boolean;
@@ -78,6 +82,7 @@ export function PostGenerationSurvey({ isOpen, onClose }: PostGenerationSurveyPr
     const [answers, setAnswers] = useState<Record<string, string>>({});
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isStarted, setIsStarted] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Reset state when modal is opened again
     useEffect(() => {
@@ -85,6 +90,7 @@ export function PostGenerationSurvey({ isOpen, onClose }: PostGenerationSurveyPr
             setAnswers({});
             setIsSubmitted(false);
             setIsStarted(false);
+            setIsSubmitting(false);
         }
     }, [isOpen]);
 
@@ -97,12 +103,43 @@ export function PostGenerationSurvey({ isOpen, onClose }: PostGenerationSurveyPr
         }));
     };
 
-    const handleSubmit = () => {
-        console.log("Survey Answers Submitted:", answers);
-        setIsSubmitted(true);
-        setTimeout(() => {
-            onClose();
-        }, 3000); // Tự đóng sau 3 giây
+    const handleSubmit = async () => {
+        setIsSubmitting(true);
+        
+        try {
+            const token = getAuthToken();
+            
+            // Gửi dữ liệu khảo sát lên API
+            await axios.post(`${API_URL}/api/survey/submit`, {
+                survey_id: 'general-feedback', // ID mặc định cho khảo sát chung
+                question_1_answer: answers.q1 || null,
+                question_2_answer: answers.q2 || null,
+                question_3_answer: answers.q3 || null,
+                rating: answers.q4 ? getRatingFromAnswer(answers.q4) : null,
+                feedback: answers.q5 || null
+            }, {
+                headers: token ? { Authorization: `Bearer ${token}` } : {}
+            });
+            
+            setIsSubmitted(true);
+            setTimeout(() => {
+                onClose();
+            }, 3000); // Tự đóng sau 3 giây
+        } catch (error) {
+            console.error('Failed to submit survey:', error);
+            alert('Có lỗi khi gửi khảo sát. Vui lòng thử lại.');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    // Convert answer text to rating number
+    const getRatingFromAnswer = (answer: string): number => {
+        if (answer.includes('Rất đẹp')) return 5;
+        if (answer.includes('Đẹp')) return 4;
+        if (answer.includes('Khá ổn')) return 3;
+        if (answer.includes('Chưa thật sự')) return 2;
+        return 1;
     };
 
     const allAnswered = QUESTIONS.every(q => answers[q.id]);
@@ -229,16 +266,24 @@ export function PostGenerationSurvey({ isOpen, onClose }: PostGenerationSurveyPr
                 <div className="flex-shrink-0 p-5 border-t border-white/10 bg-slate-900/95 flex items-center justify-end gap-3 z-10">
                     <button 
                         onClick={onClose}
-                        className="px-5 py-2 rounded-xl text-sm border border-white/10 text-slate-300 hover:bg-white/5 hover:text-white font-medium transition-colors"
+                        disabled={isSubmitting}
+                        className="px-5 py-2 rounded-xl text-sm border border-white/10 text-slate-300 hover:bg-white/5 hover:text-white font-medium transition-colors disabled:opacity-50"
                     >
                         Hủy
                     </button>
                     <button 
                         onClick={handleSubmit}
-                        disabled={!allAnswered}
-                        className="px-6 py-2 rounded-xl text-sm bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-purple-500/20"
+                        disabled={!allAnswered || isSubmitting}
+                        className="px-6 py-2 rounded-xl text-sm bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-purple-500/20 flex items-center gap-2"
                     >
-                        Gửi đánh giá
+                        {isSubmitting ? (
+                            <>
+                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                Đang gửi...
+                            </>
+                        ) : (
+                            'Gửi đánh giá'
+                        )}
                     </button>
                 </div>
                 

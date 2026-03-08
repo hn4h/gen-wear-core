@@ -88,6 +88,9 @@ app.include_router(blog_router, prefix="/api/blog", tags=["blog"])
 from apps.api.modules.payment.router import router as payment_router
 app.include_router(payment_router, prefix="/api/payment", tags=["payment"])
 
+from apps.api.modules.survey.router import router as survey_router
+app.include_router(survey_router, prefix="/api/survey", tags=["survey"])
+
 # Serve uploaded blog images as static files
 _static_dir = os.path.join(os.path.dirname(__file__), "static", "blog-images")
 os.makedirs(_static_dir, exist_ok=True)

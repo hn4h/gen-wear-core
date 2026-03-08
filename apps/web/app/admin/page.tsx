@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { getAuthToken } from '@/src/lib/useAuthStore';
 import {
     Users, ShoppingBag, TrendingUp, Cpu, FileText,
     Heart, MessageCircle, Package, DollarSign, Activity,
-    ArrowUp, ArrowDown, Clock
+    ArrowUp, ArrowDown, Clock, Star, ClipboardCheck
 } from 'lucide-react';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.genwear.io.vn';
@@ -24,6 +24,8 @@ const DollarSignIcon = DollarSign as any;
 const ActivityIcon = Activity as any;
 const ArrowUpIcon = ArrowUp as any;
 const ClockIcon = Clock as any;
+const StarIcon = Star as any;
+const ClipboardCheckIcon = ClipboardCheck as any;
 
 // ─── Stat Card ────────────────────────────────────────────────────────────────
 function StatCard({
@@ -156,6 +158,8 @@ interface Stats {
     orders_by_status: Record<string, number>;
     total_ai_generations: number; ai_generations_today: number;
     total_blog_posts: number; total_comments: number; total_likes: number;
+    total_survey_responses: number; survey_last_7_days: number; 
+    survey_last_30_days: number; avg_survey_rating: number | null;
     chart_days: string[]; chart_new_users: number[]; chart_orders: number[];
     chart_revenue: number[]; chart_ai_gens: number[];
 }
@@ -263,7 +267,7 @@ export default function AdminDashboardPage() {
             {/* ── Stat Cards Row 2: AI + Blog ── */}
             <div>
                 <p className="text-xs text-slate-500 uppercase font-semibold tracking-widest mb-3">Tương tác & Nội dung</p>
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
                     <StatCard label="Lượt gen AI" value={stats.total_ai_generations.toLocaleString('vi-VN')}
                         subLabel="lượt hôm nay" subValue={`+${stats.ai_generations_today}`}
                         icon={CpuIcon} gradient="bg-amber-500" iconColor="text-amber-400" />
@@ -273,6 +277,10 @@ export default function AdminDashboardPage() {
                         icon={MessageIcon} gradient="bg-indigo-500" iconColor="text-indigo-400" />
                     <StatCard label="Lượt Thích" value={stats.total_likes.toLocaleString('vi-VN')}
                         icon={HeartIcon} gradient="bg-rose-500" iconColor="text-rose-400" />
+                    <StatCard label="Khảo sát" value={stats.total_survey_responses.toLocaleString('vi-VN')}
+                        subLabel={stats.avg_survey_rating ? `⭐ ${stats.avg_survey_rating}/5` : "Chưa có rating"}
+                        subValue={stats.survey_last_7_days}
+                        icon={ClipboardCheckIcon} gradient="bg-violet-500" iconColor="text-violet-400" />
                 </div>
             </div>
 
