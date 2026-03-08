@@ -65,7 +65,7 @@ def edit_region_service(image_base64: str, mask_base64: str, prompt: str, user: 
                 mask=types.MaskReferenceImage(
                     reference_id=2,
                     config=types.MaskReferenceConfig(
-                        mask_mode=types.MaskMode.MASK_MODE_USER_PROVIDED,
+                        mask_mode=types.MaskReferenceMode.MASK_MODE_USER_PROVIDED,
                         mask_dilation=0.03
                     ),
                     mask_image=types.Image(image_bytes=mask_bytes)
