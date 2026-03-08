@@ -1,13 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Product, Category, Collection, Tag } from '@/src/services/products';
-import { Loader2, Save, X, Plus } from 'lucide-react';
+import { adminProductsAPI } from '@/src/services/admin-products';
+import { Loader2, Save, X, Plus, Upload } from 'lucide-react';
 
 const Loader2Icon = Loader2 as any;
 const SaveIcon = Save as any;
 const XIcon = X as any;
 const PlusIcon = Plus as any;
+const UploadIcon = Upload as any;
 
 interface ProductFormProps {
     initialData?: Product;
@@ -39,6 +41,27 @@ export function ProductForm({
     });
     
     const [newTag, setNewTag] = useState('');
+    const [isUploadingImage, setIsUploadingImage] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setIsUploadingImage(true);
+        try {
+            const { url } = await adminProductsAPI.uploadImage(file);
+            setFormData(prev => ({ ...prev, image_url: url }));
+        } catch (error) {
+            console.error('Failed to upload image:', error);
+            alert('Failed to upload image');
+        } finally {
+            setIsUploadingImage(false);
+            if (fileInputRef.current) {
+                fileInputRef.current.value = '';
+            }
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -133,18 +156,44 @@ export function ProductForm({
 
                 <div className="space-y-4">
                     <div>
-                        <label className="block text-sm text-slate-400 mb-2">Image URL</label>
-                        <input
-                            type="text"
-                            value={formData.image_url}
-                            onChange={(e) => setFormData({...formData, image_url: e.target.value})}
-                            className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50"
-                        />
+                        <label className="block text-sm text-slate-400 mb-2">Product Image</label>
+                        <div className="flex gap-4 items-start">
+                            <div className="flex-1">
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    ref={fileInputRef}
+                                    onChange={handleImageUpload}
+                                    className="hidden"
+                                    id="image-upload"
+                                />
+                                <label 
+                                    htmlFor="image-upload"
+                                    className={`w-full flex items-center justify-center gap-2 border border-white/10 rounded-xl px-4 py-3 text-white transition-colors ${
+                                        isUploadingImage 
+                                            ? 'bg-slate-800 cursor-not-allowed opacity-70' 
+                                            : 'bg-slate-900 hover:bg-slate-800 cursor-pointer focus-within:ring-2 focus-within:ring-purple-500/50'
+                                    }`}
+                                >
+                                    {isUploadingImage ? (
+                                        <>
+                                            <Loader2Icon className="w-5 h-5 animate-spin" />
+                                            Uploading...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <UploadIcon className="w-5 h-5 text-slate-400" />
+                                            {formData.image_url ? 'Change Image' : 'Upload Image'}
+                                        </>
+                                    )}
+                                </label>
+                            </div>
+                        </div>
                         {formData.image_url && (
                             <img 
                                 src={formData.image_url} 
                                 alt="Preview" 
-                                className="mt-2 w-full h-40 object-cover rounded-xl border border-white/10"
+                                className="mt-4 w-full h-48 object-cover rounded-xl border border-white/10"
                             />
                         )}
                     </div>

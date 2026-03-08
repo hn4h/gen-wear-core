@@ -1,4 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile, File
+import os
+import uuid
+import shutil
 from sqlalchemy.orm import Session
 from typing import Optional
 from apps.api.modules.auth.database import get_db
@@ -14,6 +17,33 @@ from apps.api.modules.products.schemas import (
 )
 
 router = APIRouter(tags=["products"])
+
+# ─── Image Upload ─────────────────────────────────────────────────────────────
+
+UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "static", "products-images")
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+_API_BASE = os.getenv("API_BASE_URL", "https://api.genwear.io.vn")
+
+@router.post("/upload-image")
+async def upload_image(
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_admin_user),
+):
+    """Upload an image for a product. Returns the public URL."""
+    allowed = {"image/jpeg", "image/png", "image/webp", "image/gif"}
+    if file.content_type not in allowed:
+        raise HTTPException(status_code=400, detail="Only JPEG, PNG, WEBP, or GIF allowed")
+
+    ext = file.filename.rsplit(".", 1)[-1] if "." in file.filename else "jpg"
+    filename = f"{uuid.uuid4()}.{ext}"
+    dest_path = os.path.join(UPLOAD_DIR, filename)
+
+    with open(dest_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+
+    url = f"{_API_BASE}/static/products-images/{filename}"
+    return {"url": url}
 
 @router.get("", response_model=ProductListResponse)
 async def list_products(

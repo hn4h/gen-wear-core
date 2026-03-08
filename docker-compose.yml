@@ -10,7 +10,7 @@ services:
       - "3000:3000"
     environment:
       # URL trình duyệt gọi API (Client Side)
-      - NEXT_PUBLIC_API_URL=https://api.genwear.io.vn
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
     depends_on:
       - api
     volumes:
@@ -34,8 +34,8 @@ services:
       - PAYOS_CLIENT_ID=${PAYOS_CLIENT_ID}
       - PAYOS_API_KEY=${PAYOS_API_KEY}
       - PAYOS_CHECKSUM_KEY=${PAYOS_CHECKSUM_KEY}
-      - FRONTEND_URL=https://genwear.io.vn
-      - API_BASE_URL=https://api.genwear.io.vn
+      - FRONTEND_URL=http://localhost:3000
+      - API_BASE_URL=http://localhost:8000
       - UPLOAD_DIR=/app/uploads
     depends_on:
       postgres:
@@ -44,7 +44,7 @@ services:
         condition: service_healthy
     volumes:
       - ./apps/api:/app/apps/api
-      - E:/genwear-uploads:/app/uploads
+      - D:/genwear-uploads:/app/uploads
     # QUAN TRỌNG: --reload để sửa code thấy ngay, host 0.0.0.0 để docker hiểu
     command: uvicorn apps.api.main:app --host 0.0.0.0 --port 8000 --reload
 

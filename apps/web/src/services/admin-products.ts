@@ -26,5 +26,18 @@ export const adminProductsAPI = {
         await axios.delete(`${API_URL}/api/products/${id}`, {
             headers: { Authorization: `Bearer ${token}` }
         });
+    },
+
+    uploadImage: async (file: File) => {
+        const token = getAuthToken();
+        const formData = new FormData();
+        formData.append('file', file);
+        const response = await axios.post<{url: string}>(`${API_URL}/api/products/upload-image`, formData, {
+            headers: { 
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+        return response.data;
     }
 };
