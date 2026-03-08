@@ -75,8 +75,8 @@ export function Footer() {
             <h3 className="text-white font-semibold mb-6">Công ty</h3>
             <ul className="space-y-4">
               <li>
-                <Link href="/about" className="text-gray-400 hover:text-white transition-colors text-sm">
-                  Về chúng tôi
+                <Link href="/pricing" className="text-gray-400 hover:text-white transition-colors">
+                  Bảng giá
                 </Link>
               </li>
               <li>

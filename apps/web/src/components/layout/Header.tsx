@@ -86,8 +86,8 @@ export function Header() {
             <Link href="/blog" className="text-gray-300 hover:text-white transition-colors font-medium">
               Blog
             </Link>
-            <Link href="/about" className="text-gray-300 hover:text-white transition-colors font-medium">
-              Về chúng tôi
+            <Link href="/pricing" className="text-gray-300 hover:text-white transition-colors font-medium">
+              Bảng giá
             </Link>
           </nav>
 
@@ -106,36 +106,45 @@ export function Header() {
                         </span>
                     )}
                  </button>
-                <div className="flex items-center gap-3 pl-4 border-l border-white/10">
-                    <div className="text-right hidden lg:block">
-                        <div className="flex items-center justify-end gap-2 mb-1">
-                            <p className="text-sm font-medium text-white">{user.full_name}</p>
-                            {user.account_tier === 'PRO' ? (
-                                <Link href="/pricing" className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:opacity-80 transition-opacity">PRO</Link>
-                            ) : (
-                                <Link href="/pricing" className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-300 hover:bg-slate-600 transition-colors">FREE</Link>
-                            )}
+                <div className="relative group flex items-center pl-4 border-l border-white/10">
+                    <div className="flex items-center gap-3 cursor-pointer">
+                        <div className="text-right hidden lg:block">
+                            <div className="flex items-center justify-end gap-2 text-white">
+                                <p className="text-sm font-medium">{user.full_name}</p>
+                                {user.account_tier === 'PRO' ? (
+                                    <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-gradient-to-r from-purple-500 to-pink-500 text-white">PRO</span>
+                                ) : (
+                                    <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-300">FREE</span>
+                                )}
+                            </div>
                         </div>
-                        {user.role === 'ADMIN' && (
-                            <Link href="/admin" className="block text-xs text-pink-400 hover:text-pink-300 font-bold mb-1">
-                                Admin Dashboard
-                            </Link>
-                        )}
-                        <Link href="/designs" className="block text-xs text-slate-300 hover:text-white mb-1">
-                            Thiết kế của tôi
-                        </Link>
-                        <Link href="/orders" className="block text-xs text-slate-300 hover:text-white mb-1">
-                            Lịch sử đơn hàng
-                        </Link>
-                        <button 
-                            onClick={() => logout()}
-                            className="text-xs text-purple-400 hover:text-purple-300"
-                        >
-                            Đăng xuất
-                        </button>
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold shadow-md">
+                            {user.full_name.charAt(0)}
+                        </div>
                     </div>
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold">
-                        {user.full_name.charAt(0)}
+
+                    {/* Dropdown Menu */}
+                    <div className="absolute top-full right-0 pt-3 w-52 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                        <div className="bg-slate-800 border border-white/10 rounded-xl shadow-2xl py-2 overflow-hidden">
+                            {user.role === 'ADMIN' && (
+                                <Link href="/admin" className="block px-4 py-2.5 text-sm text-pink-400 hover:bg-white/5 font-bold transition-colors">
+                                    Admin Dashboard
+                                </Link>
+                            )}
+                            <Link href="/designs" className="block px-4 py-2.5 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition-colors">
+                                Thiết kế của tôi
+                            </Link>
+                            <Link href="/orders" className="block px-4 py-2.5 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition-colors">
+                                Lịch sử đơn hàng
+                            </Link>
+                            <div className="border-t border-white/10 my-1"></div>
+                            <button 
+                                onClick={() => logout()}
+                                className="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-white/5 hover:text-red-300 transition-colors font-medium"
+                            >
+                                Đăng xuất
+                            </button>
+                        </div>
                     </div>
                 </div>
               </div>
@@ -173,6 +182,9 @@ export function Header() {
           <div className="px-4 py-6 space-y-4">
             <Link href="/" className="block text-lg text-gray-300 hover:text-white font-medium">
               Trang chủ
+            </Link>
+            <Link href="/pricing" className="block text-lg text-gray-300 hover:text-white font-medium">
+              Bảng giá
             </Link>
             <Link href="/products" className="block text-lg text-gray-300 hover:text-white font-medium">
               Sản phẩm
