@@ -69,6 +69,30 @@ export default function PricingPage() {
         }
     };
 
+    const handleUpgradeToUltra = async () => {
+        if (!user) {
+            router.push('/login?redirect=/pricing');
+            return;
+        }
+        
+        setIsProcessing(true);
+        try {
+            const baseUrl = window.location.origin;
+            const res = await authAPI.upgradeToUltra(
+                `${baseUrl}/profile`,
+                `${baseUrl}/pricing`
+            );
+            
+            if (res.checkout_url) {
+                window.location.href = res.checkout_url;
+            }
+        } catch (error: any) {
+            console.error("Error creating ULTRA upgrade payment:", error);
+            alert(error.response?.data?.detail || "Có lỗi xảy ra khi tạo giao dịch. Vui lòng thử lại sau.");
+            setIsProcessing(false);
+        }
+    };
+
     const handlePurchaseCredits = async (packageId: number) => {
         if (!user) {
             router.push('/login?redirect=/pricing');
@@ -123,8 +147,8 @@ export default function PricingPage() {
                     </div>
 
                     {!isPro ? (
-                        /* Free vs Pro comparison */
-                        <div className="mx-auto mt-16 grid max-w-lg grid-cols-1 gap-y-6 sm:mt-20 lg:max-w-4xl lg:grid-cols-2 lg:gap-x-8">
+                        /* Free vs Pro vs Ultra comparison */
+                        <div className="mx-auto mt-16 grid max-w-lg grid-cols-1 gap-y-6 sm:mt-20 lg:max-w-7xl lg:grid-cols-3 lg:gap-x-6">
                         {/* Free Tier */}
                         <div className="flex flex-col justify-between rounded-3xl bg-slate-800/40 p-8 ring-1 ring-white/10 xl:p-10 backdrop-blur-md transition-all hover:bg-slate-800/60 duration-300">
                             <div>
@@ -242,10 +266,146 @@ export default function PricingPage() {
                                 )}
                             </button>
                         </div>
+
+                        {/* Ultra Tier */}
+                        <div className="flex flex-col justify-between rounded-3xl bg-gradient-to-br from-orange-900/50 via-red-900/50 to-pink-900/50 p-8 ring-2 ring-orange-500 xl:p-10 relative overflow-hidden backdrop-blur-md shadow-[0_0_50px_-10px_rgba(249,115,22,0.4)]">
+                            <div className="absolute top-0 right-0 w-40 h-40 bg-orange-500/30 blur-[50px] rounded-full translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+                            <div className="absolute bottom-0 left-0 w-40 h-40 bg-red-500/30 blur-[50px] rounded-full -translate-x-1/2 translate-y-1/2 pointer-events-none" />
+                            
+                            <div className="relative z-10">
+                                <div className="flex items-center justify-between gap-x-4">
+                                    <h3 className="flex items-center gap-2 text-2xl font-semibold leading-8 text-white">
+                                        Ultra 🔥
+                                    </h3>
+                                    <span className="rounded-full bg-orange-500/20 px-3 py-1 text-xs font-semibold leading-5 text-orange-200 ring-1 ring-inset ring-orange-500/30 shadow-[0_0_15px_rgba(249,115,22,0.3)]">
+                                        Best Value
+                                    </span>
+                                </div>
+                                <p className="mt-4 text-sm leading-6 text-slate-200">
+                                    Dành cho creator & studio chuyên nghiệp.
+                                </p>
+                                <p className="mt-6 flex items-baseline gap-x-1">
+                                    <span className="text-4xl font-bold tracking-tight text-white">299.000đ</span>
+                                    <span className="text-sm font-semibold leading-6 text-slate-300">/ 30 ngày</span>
+                                </p>
+                                <p className="mt-2 text-xs text-orange-300/80 uppercase tracking-wide">100 credits miễn phí mỗi ngày</p>
+                                
+                                <ul role="list" className="mt-8 space-y-3 text-sm leading-6 text-slate-200">
+                                    <li className="flex gap-x-3 items-center">
+                                        <Check className="h-5 w-5 flex-none text-orange-400 drop-shadow-[0_0_8px_rgba(249,115,22,0.5)]" aria-hidden="true" />
+                                        <span><strong className="text-white">100 credits miễn phí</strong> mỗi ngày</span>
+                                    </li>
+                                    <li className="flex gap-x-3 items-center">
+                                        <Zap className="h-5 w-5 flex-none text-orange-400" aria-hidden="true" />
+                                        <span>Render <strong className="text-white">tốc độ cao nhất</strong></span>
+                                    </li>
+                                    <li className="flex gap-x-3 items-center">
+                                        <Check className="h-5 w-5 flex-none text-orange-400 drop-shadow-[0_0_8px_rgba(249,115,22,0.5)]" aria-hidden="true" />
+                                        <span>Upscale <strong className="text-white">8K siêu nét</strong></span>
+                                    </li>
+                                    <li className="flex gap-x-3 items-center">
+                                        <ImageIcon className="h-5 w-5 flex-none text-orange-400" aria-hidden="true" />
+                                        <span><strong className="text-white">Outpainting & Remove Object AI</strong></span>
+                                    </li>
+                                    <li className="flex gap-x-3 items-center">
+                                        <Check className="h-5 w-5 flex-none text-orange-400" aria-hidden="true" />
+                                        <span>Lưu <strong className="text-white">prompt & workflow</strong></span>
+                                    </li>
+                                    <li className="flex gap-x-3 items-center">
+                                        <Sparkles className="h-5 w-5 flex-none text-orange-400" aria-hidden="true" />
+                                        <span>Truy cập <strong className="text-white">AI model mới sớm nhất</strong></span>
+                                    </li>
+                                    <li className="flex gap-x-3 items-center">
+                                        <Crown className="h-5 w-5 flex-none text-orange-400" aria-hidden="true" />
+                                        <span>Toàn bộ tính năng <strong className="text-white">Pro + Advanced</strong></span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <button
+                                onClick={handleUpgradeToUltra}
+                                disabled={isProcessing}
+                                className="mt-8 flex justify-center items-center gap-2 rounded-xl bg-gradient-to-r from-orange-600 to-red-600 px-3 py-3 text-center text-sm font-bold leading-6 text-white shadow-[0_0_25px_rgba(249,115,22,0.5)] hover:shadow-[0_0_30px_rgba(249,115,22,0.7)] hover:from-orange-700 hover:to-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500 transition-all duration-200 relative z-10 transform hover:scale-105 disabled:opacity-50 disabled:scale-100 disabled:cursor-not-allowed"
+                            >
+                                {isProcessing ? (
+                                    <>
+                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                        Đang tạo...
+                                    </>
+                                ) : (
+                                    'Nâng cấp Ultra ngay'
+                                )}
+                            </button>
+                        </div>
                     </div>
                     ) : (
                         /* Credit Packages for PRO users */
-                        <div className="mx-auto mt-16 max-w-5xl">
+                        <div className="mx-auto mt-16 max-w-7xl">
+                            {/* Ultra Upgrade Card for PRO users */}
+                            <div className="mb-12 mx-auto max-w-3xl">
+                                <div className="rounded-3xl bg-gradient-to-br from-orange-900/50 via-red-900/50 to-pink-900/50 p-8 ring-2 ring-orange-500 backdrop-blur-md shadow-[0_0_50px_-10px_rgba(249,115,22,0.4)] relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 w-40 h-40 bg-orange-500/30 blur-[50px] rounded-full translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+                                    <div className="absolute bottom-0 left-0 w-40 h-40 bg-red-500/30 blur-[50px] rounded-full -translate-x-1/2 translate-y-1/2 pointer-events-none" />
+                                    
+                                    <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                                        <div className="flex-1">
+                                            <div className="flex items-center gap-3 mb-3">
+                                                <h3 className="text-2xl font-bold text-white">Nâng cấp lên Ultra 🔥</h3>
+                                                <span className="rounded-full bg-orange-500/20 px-3 py-1 text-xs font-semibold text-orange-200 ring-1 ring-inset ring-orange-500/30">
+                                                    Giảm giá đặc biệt
+                                                </span>
+                                            </div>
+                                            <p className="text-slate-200 mb-4">
+                                                Mở khóa toàn bộ tính năng cao cấp với <strong className="text-white">100 credits miễn phí mỗi ngày</strong>
+                                            </p>
+                                            <div className="flex flex-wrap gap-4 text-sm">
+                                                <div className="flex items-center gap-2">
+                                                    <Zap className="h-4 w-4 text-orange-400" />
+                                                    <span className="text-slate-200">Render siêu nhanh</span>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <Check className="h-4 w-4 text-orange-400" />
+                                                    <span className="text-slate-200">Upscale 8K</span>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <ImageIcon className="h-4 w-4 text-orange-400" />
+                                                    <span className="text-slate-200">AI Tools nâng cao</span>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <Sparkles className="h-4 w-4 text-orange-400" />
+                                                    <span className="text-slate-200">AI model mới nhất</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="flex flex-col items-center md:items-end gap-3">
+                                            <div className="text-center md:text-right">
+                                                <p className="text-3xl font-bold text-white">299.000đ</p>
+                                                <p className="text-sm text-slate-300">/ 30 ngày</p>
+                                            </div>
+                                            <button
+                                                onClick={handleUpgradeToUltra}
+                                                disabled={isProcessing}
+                                                className="whitespace-nowrap rounded-xl bg-gradient-to-r from-orange-600 to-red-600 px-6 py-3 text-sm font-bold text-white shadow-[0_0_25px_rgba(249,115,22,0.5)] hover:shadow-[0_0_30px_rgba(249,115,22,0.7)] hover:from-orange-700 hover:to-red-700 transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:scale-100 disabled:cursor-not-allowed flex items-center gap-2"
+                                            >
+                                                {isProcessing ? (
+                                                    <>
+                                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                                        Đang xử lý...
+                                                    </>
+                                                ) : (
+                                                    'Nâng cấp ngay'
+                                                )}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Credit Packages Section */}
+                            <div className="text-center mb-8">
+                                <h3 className="text-2xl font-bold text-white mb-2">Hoặc mua thêm Credits</h3>
+                                <p className="text-slate-400">Tăng thêm credits để tiếp tục sáng tạo</p>
+                            </div>
+                            
                             {loadingPackages ? (
                                 <div className="flex justify-center items-center py-20">
                                     <Loader2 className="w-8 h-8 animate-spin text-purple-400" />

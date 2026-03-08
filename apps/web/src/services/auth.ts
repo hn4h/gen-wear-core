@@ -97,6 +97,14 @@ export const authAPI = {
     return response.data;
   },
 
+  upgradeToUltra: async (returnUrl: string, cancelUrl: string) => {
+    const response = await apiClient.post('/api/auth/upgrade-to-ultra', {
+      return_url: returnUrl,
+      cancel_url: cancelUrl,
+    });
+    return response.data;
+  },
+
   logout: () => {
     localStorage.removeItem('auth_token');
   },

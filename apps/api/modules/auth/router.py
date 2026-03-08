@@ -5,6 +5,7 @@ from apps.api.modules.auth.schemas import (
     LoginRequest, TokenResponse, UserResponse,
     UserProfileUpdate, PasswordChange,
     UpgradeToProRequest, UpgradeToProResponse,
+    UpgradeToUltraRequest, UpgradeToUltraResponse,
     SubscriptionStatusResponse
 )
 from apps.api.modules.auth.service import (
@@ -189,6 +190,59 @@ async def create_pro_upgrade(
         )
     except Exception as e:
         logging.exception("Error creating PRO upgrade payment link")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to create payment link: {str(e)}"
+        )
+
+@router.post("/upgrade-to-ultra", response_model=UpgradeToUltraResponse)
+async def create_ultra_upgrade(
+    request: UpgradeToUltraRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Create PayOS payment link to upgrade to ULTRA (30 days)"""
+    if not payos_client:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Payment service not configured"
+        )
+    
+    # Check and update subscription status
+    current_user = check_and_update_subscription_status(db, current_user)
+    
+    # ULTRA subscription price: 299,000 VND for 30 days
+    amount = 299000
+    duration_days = 30
+    
+    # Create unique order code using timestamp and user_id
+    order_code = int(f"{int(time.time())}{current_user.id[:4]}"[:9])
+    
+    # Description max 25 chars for PayOS
+    description = f"ULTRA {current_user.id[:8]}"
+    
+    try:
+        # Create payment link using PayOS
+        payment_data = PaymentData(
+            orderCode=order_code,
+            amount=amount,
+            description=description,
+            returnUrl=request.return_url,
+            cancelUrl=request.cancel_url
+        )
+        
+        payment_link_response = payos_client.createPaymentLink(payment_data)
+        
+        logging.info(f"Created ULTRA upgrade payment for user {current_user.id}: {order_code}")
+        
+        return UpgradeToUltraResponse(
+            checkout_url=payment_link_response.checkoutUrl,
+            order_code=str(order_code),
+            amount=amount,
+            description=f"Nâng cấp ULTRA {duration_days} ngày"
+        )
+    except Exception as e:
+        logging.exception("Error creating ULTRA upgrade payment link")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to create payment link: {str(e)}"
