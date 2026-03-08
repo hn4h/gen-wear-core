@@ -24,7 +24,7 @@ export default function ProductDetailPage() {
     const { user } = useAuthStore();
     const [product, setProduct] = useState<Product | null>(null);
     const [isLoading, setIsLoading] = useState(true);
-    const [selectedSize, setSelectedSize] = useState('M');
+    const [selectedSize, setSelectedSize] = useState('55x55 cm');
     
     useEffect(() => {
         const fetchProduct = async () => {
@@ -132,11 +132,11 @@ export default function ProductDetailPage() {
                         <div>
                             <h3 className="text-sm font-medium text-slate-400 mb-3 uppercase tracking-wider">Size</h3>
                             <div className="flex flex-wrap gap-3">
-                                {['S', 'M', 'L', 'XL'].map((size) => (
+                                {['55x55 cm'].map((size) => (
                                     <button
                                         key={size}
                                         onClick={() => setSelectedSize(size)}
-                                        className={`w-12 h-12 rounded-xl border flex items-center justify-center font-medium transition-all ${
+                                        className={`px-4 h-12 rounded-xl border flex items-center justify-center font-medium transition-all ${
                                             selectedSize === size
                                                 ? 'border-purple-500 bg-purple-500/20 text-white'
                                                 : 'border-white/10 text-slate-400 hover:border-white/30 hover:text-white'
