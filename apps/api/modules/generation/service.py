@@ -22,7 +22,15 @@ def generate_pattern_service(prompt: str, user: User, db: Session):
     # generate_image returns a raw base64 string
     base64_image = generate_image(optimized_prompt)
 
-    # 3. Save to D drive (mounted at /app/uploads inside container)
+    # 3. Apply tier-specific processing (Resolution & Watermark)
+    # Resize to 1K for Free, keep original (up to 4K) for Pro
+    processed_base64 = resize_for_tier(base64_image, user.account_tier)
+    
+    # Apply watermark if FREE tier
+    if user.account_tier == "FREE":
+        processed_base64 = apply_watermark(processed_base64)
+
+    # 4. Save to D drive (mounted at /app/uploads inside container)
     upload_dir = os.getenv("UPLOAD_DIR", "/app/uploads")
     os.makedirs(upload_dir, exist_ok=True)
 
@@ -30,28 +38,21 @@ def generate_pattern_service(prompt: str, user: User, db: Session):
     filepath = os.path.join(upload_dir, filename)
 
     try:
-        image_bytes = _get_image_bytes(base64_image)
+        image_bytes = _get_image_bytes(processed_base64)
         with open(filepath, "wb") as f:
             f.write(image_bytes)
 
         # Build public URL
-        api_base = os.getenv("API_BASE_URL", "http://localhost:8000")
+        api_base = os.getenv("API_BASE_URL", "https://api.genwear.io.vn")
         image_url = f"{api_base}/static/designs/{filename}"
         print(f"Saved design image: {filepath} → {image_url}")
     except Exception as save_err:
         # Fallback: nếu không lưu được file thì vẫn trả base64 để không crash
         print(f"Warning: could not save image to disk: {save_err}. Falling back to base64.")
-        image_url = f"data:image/png;base64,{base64_image}"
-    # 3. Apply tier-specific processing (Resolution & Watermark)
-    # Resize to 1K for Free, keep original (up to 4K) for Pro
-    base64_image = resize_for_tier(base64_image, user.account_tier)
+        image_url = f"data:image/png;base64,{processed_base64}"
     
-    # Apply watermark if FREE tier
-    if user.account_tier == "FREE":
-        base64_image = apply_watermark(base64_image)
-    
-    # 4. Construct response
-    # Returning Data URI schema so frontend can use it directly in <img src="...">
+    # 5. Construct response
+    # Returning url so frontend can use it directly in <img src="...">
     return {
         "url": image_url,
         "prompt": optimized_prompt

@@ -1,7 +1,9 @@
 import { useState, useCallback } from "react";
 import { useAuthStore } from "@/src/lib/useAuthStore";
+import { authAPI } from "@/src/services/auth";
+import { toast } from "react-hot-toast";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.genwear.io.vn';
 
 interface GenResponse {
     url: string;
@@ -23,16 +25,16 @@ export function useDesignGeneration(): UseDesignGenerationReturn {
     const [isLoading, setIsLoading] = useState(false);
     const [textureUrl, setTextureUrl] = useState<string | undefined>();
 
-    const { token } = useAuthStore();
+    const { token, setUser } = useAuthStore();
 
     const generatePattern = useCallback(async () => {
         if (!prompt) {
-            console.warn("[useDesignGeneration] No prompt, skipping.");
+            toast.error("Vui lòng nhập ý tưởng thiết kế.");
             return;
         }
 
         if (!token) {
-            console.error("[useDesignGeneration] No auth token found");
+            toast.error("Vui lòng đăng nhập để sử dụng tính năng này.");
             return;
         }
 
@@ -56,6 +58,16 @@ export function useDesignGeneration(): UseDesignGenerationReturn {
             if (!response.ok) {
                 const errorText = await response.text();
                 console.error("[useDesignGeneration] API Error:", response.status, errorText);
+                let errorMessage = "Lỗi khi tạo thiết kế.";
+                try {
+                    const parsedError = JSON.parse(errorText);
+                    if (parsedError.detail) {
+                        errorMessage = parsedError.detail;
+                    }
+                } catch (e) {
+                    // ignore
+                }
+                toast.error(errorMessage);
                 throw new Error(`API responded with status ${response.status}: ${errorText}`);
             }
 
@@ -66,6 +78,15 @@ export function useDesignGeneration(): UseDesignGenerationReturn {
             if (data.url) {
                 console.log("[useDesignGeneration] Setting textureUrl, prefix:", data.url.slice(0, 30));
                 setTextureUrl(data.url);
+                toast.success("Tạo thiết kế thành công!");
+                
+                // Refresh user credits
+                try {
+                    const updatedUser = await authAPI.getCurrentUser();
+                    setUser(updatedUser);
+                } catch (e) {
+                    console.error("Failed to refresh user data:", e);
+                }
             } else {
                 console.warn("[useDesignGeneration] data.url is empty or missing:", data);
             }
@@ -78,7 +99,7 @@ export function useDesignGeneration(): UseDesignGenerationReturn {
         } finally {
             setIsLoading(false);
         }
-    }, [prompt, token]);
+    }, [prompt, token, setUser]);
 
     return {
         prompt,

@@ -5,7 +5,8 @@ import json
 import time
 import logging
 from apps.api.modules.auth.models import User
-from apps.api.modules.credits.service import PRO_CREDITS_PER_PACKAGE, PRO_PACKAGE_PRICE
+from apps.api.modules.credits.service import CREDIT_PACKAGES
+from payos import PaymentData
 
 # PayOS Configuration
 PAYOS_CLIENT_ID = os.getenv("PAYOS_CLIENT_ID", "")
@@ -14,74 +15,50 @@ PAYOS_CHECKSUM_KEY = os.getenv("PAYOS_CHECKSUM_KEY", "")
 PAYOS_API_URL = "https://api-merchant.payos.vn"
 
 
-def create_payment_link(user: User, return_url: str, cancel_url: str) -> dict:
+def create_payment_link_for_package(user: User, package_id: int, return_url: str, cancel_url: str) -> dict:
     """
-    Tạo link thanh toán PayOS.
+    Tạo link thanh toán PayOS cho gói credits cụ thể.
     Returns dict with checkout_url, order_id, amount, credits
     """
-    import requests
+    from apps.api.modules.payment.payos_client import payos_client
     
-    order_code = int(time.time() * 1000) % 2147483647  # Ensure fits in int32
-    amount = int(PRO_PACKAGE_PRICE)
-    description = f"GENWEAR_{user.id}"
+    if not payos_client:
+        raise Exception("PayOS client not configured")
     
-    # Create payment data
-    payment_data = {
-        "orderCode": order_code,
-        "amount": amount,
-        "description": description,
-        "items": [
-            {
-                "name": f"Gói {PRO_CREDITS_PER_PACKAGE} Credits Gen Wear",
-                "quantity": 1,
-                "price": amount
-            }
-        ],
-        "returnUrl": return_url,
-        "cancelUrl": cancel_url
-    }
+    # Get package info
+    if package_id not in CREDIT_PACKAGES:
+        raise Exception(f"Invalid package_id: {package_id}")
     
-    # Create signature
-    signature_data = f"amount={amount}&cancelUrl={cancel_url}&description={description}&orderCode={order_code}&returnUrl={return_url}"
-    signature = hmac.new(
-        PAYOS_CHECKSUM_KEY.encode('utf-8'),
-        signature_data.encode('utf-8'),
-        hashlib.sha256
-    ).hexdigest()
+    package_info = CREDIT_PACKAGES[package_id]
     
-    payment_data["signature"] = signature
+    order_code = int(f"{int(time.time())}{user.id[:4]}"[:9])
+    amount = package_info["price"]
+    # Description max 25 chars for PayOS
+    description = f"CR{package_id} {user.id[:8]}"
     
-    # Call PayOS API
-    headers = {
-        "Content-Type": "application/json",
-        "x-client-id": PAYOS_CLIENT_ID,
-        "x-api-key": PAYOS_API_KEY
-    }
-    
-    response = requests.post(
-        f"{PAYOS_API_URL}/v2/payment-requests",
-        json=payment_data,
-        headers=headers
-    )
-    
-    if response.status_code != 200:
-        logging.error(f"PayOS API error: {response.text}")
-        raise Exception(f"PayOS API error: {response.status_code}")
-    
-    result = response.json()
-    
-    if result.get("code") != "00":
-        logging.error(f"PayOS error: {result}")
-        raise Exception(f"PayOS error: {result.get('desc', 'Unknown error')}")
-    
-    data = result.get("data", {})
-    
-    return {
-        "checkout_url": data.get("checkoutUrl", ""),
-        "order_id": str(order_code),
-        "amount": amount,
-        "credits": PRO_CREDITS_PER_PACKAGE
-    }
+    try:
+        # Create payment data using PaymentData class
+        payment_data = PaymentData(
+            orderCode=order_code,
+            amount=amount,
+            description=description,
+            returnUrl=return_url,
+            cancelUrl=cancel_url
+        )
+        
+        payment_link_response = payos_client.createPaymentLink(payment_data)
+        
+        logging.info(f"Created payment link for user {user.id}, package {package_id}: {order_code}")
+        
+        return {
+            "checkout_url": payment_link_response.checkoutUrl,
+            "order_id": str(order_code),
+            "amount": amount,
+            "credits": package_info["credits"]
+        }
+    except Exception as e:
+        logging.exception(f"Error creating payment link: {e}")
+        raise
 
 
 def verify_webhook_signature(payload: dict) -> bool:

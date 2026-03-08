@@ -150,3 +150,71 @@ def get_current_admin_user(
             detail="The user doesn't have enough privileges"
         )
     return current_user
+
+def upgrade_to_pro(db: Session, user: User, duration_days: int = 30) -> User:
+    """Upgrade user to PRO tier"""
+    from datetime import timedelta
+    
+    now = datetime.utcnow()
+    
+    # If already PRO and active, extend the subscription
+    if user.account_tier == "PRO" and user.pro_subscription_status == "ACTIVE":
+        # Extend from current end date if it exists and is in the future
+        if user.pro_subscription_end and user.pro_subscription_end > now:
+            user.pro_subscription_end = user.pro_subscription_end + timedelta(days=duration_days)
+        else:
+            # Expired or no end date, start fresh
+            user.pro_subscription_start = now
+            user.pro_subscription_end = now + timedelta(days=duration_days)
+    else:
+        # New PRO subscription
+        user.account_tier = "PRO"
+        user.pro_subscription_status = "ACTIVE"
+        user.pro_subscription_start = now
+        user.pro_subscription_end = now + timedelta(days=duration_days)
+    
+    # Reset daily credits for PRO tier (PRO users get 20 daily credits)
+    user.daily_credits_remaining = 20
+    user.daily_credits_reset_at = now + timedelta(days=1)
+    
+    db.commit()
+    db.refresh(user)
+    return user
+
+def check_and_update_subscription_status(db: Session, user: User) -> User:
+    """Check and update user subscription status if expired"""
+    now = datetime.utcnow()
+    
+    if user.account_tier == "PRO" and user.pro_subscription_end:
+        if user.pro_subscription_end < now and user.pro_subscription_status == "ACTIVE":
+            # Subscription expired
+            user.pro_subscription_status = "EXPIRED"
+            user.account_tier = "FREE"
+            # Reset daily credits to FREE tier limit
+            user.daily_credits_remaining = 5
+            db.commit()
+            db.refresh(user)
+    
+    return user
+
+def get_subscription_status(user: User) -> dict:
+    """Get user subscription status information"""
+    from datetime import datetime
+    
+    result = {
+        "account_tier": user.account_tier,
+        "subscription_status": user.pro_subscription_status,
+        "subscription_start": user.pro_subscription_start,
+        "subscription_end": user.pro_subscription_end,
+        "days_remaining": None
+    }
+    
+    if user.account_tier == "PRO" and user.pro_subscription_end:
+        now = datetime.utcnow()
+        if user.pro_subscription_end > now:
+            delta = user.pro_subscription_end - now
+            result["days_remaining"] = delta.days + 1  # Include current day
+        else:
+            result["days_remaining"] = 0
+    
+    return result

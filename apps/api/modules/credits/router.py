@@ -1,20 +1,24 @@
 from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
-from apps.api.modules.auth.service import get_current_user
+from apps.api.modules.auth.service import get_current_user, check_and_update_subscription_status
 from apps.api.modules.auth.models import User
 from apps.api.modules.auth.database import get_db
 from apps.api.modules.credits.service import (
     get_credit_balance,
     get_credit_history,
-    purchase_credits
+    purchase_credits,
+    get_available_packages,
+    CREDIT_PACKAGES
 )
 from apps.api.modules.credits.payos_service import (
-    create_payment_link,
+    create_payment_link_for_package,
     verify_webhook_signature
 )
 from apps.api.modules.credits.schemas import (
     PurchaseCreditsRequest,
-    PurchaseCreditsResponse
+    PurchaseCreditsResponse,
+    AvailablePackagesResponse,
+    CreditPackageOption
 )
 from fastapi import HTTPException
 import logging
@@ -42,20 +46,60 @@ def get_history(
     return get_credit_history(current_user, db, limit=limit, offset=offset)
 
 
-@router.post("/purchase")
+@router.get("/packages", response_model=AvailablePackagesResponse)
+def get_packages(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Xem các gói credits có sẵn (chỉ cho PRO users)"""
+    # Check subscription status
+    current_user = check_and_update_subscription_status(db, current_user)
+    
+    if current_user.account_tier != "PRO":
+        raise HTTPException(
+            status_code=403,
+            detail="Only PRO users can purchase credit packages. Please upgrade to PRO first."
+        )
+    
+    packages = get_available_packages()
+    return AvailablePackagesResponse(
+        packages=[CreditPackageOption(**pkg) for pkg in packages]
+    )
+
+
+@router.post("/purchase", response_model=PurchaseCreditsResponse)
 def create_purchase(
     request: PurchaseCreditsRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Tạo link thanh toán PayOS để mua credits"""
+    """Tạo link thanh toán PayOS để mua credits (chỉ PRO users)"""
     try:
-        result = create_payment_link(
+        # Check subscription status
+        current_user = check_and_update_subscription_status(db, current_user)
+        
+        if current_user.account_tier != "PRO":
+            raise HTTPException(
+                status_code=403,
+                detail="Only PRO users can purchase credit packages. Please upgrade to PRO first."
+            )
+        
+        # Validate package
+        if request.package_id not in CREDIT_PACKAGES:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid package_id. Must be one of: {list(CREDIT_PACKAGES.keys())}"
+            )
+        
+        result = create_payment_link_for_package(
             user=current_user,
+            package_id=request.package_id,
             return_url=request.return_url,
             cancel_url=request.cancel_url
         )
         return result
+    except HTTPException:
+        raise
     except Exception as e:
         logging.exception("Error creating payment link")
         raise HTTPException(status_code=500, detail=str(e))
@@ -71,64 +115,69 @@ async def payos_webhook(request: Request, db: Session = Depends(get_db)):
         payload = await request.json()
         logging.info(f"PayOS webhook received: {payload}")
         
-        # Verify webhook signature
-        if not verify_webhook_signature(payload):
-            raise HTTPException(status_code=400, detail="Invalid webhook signature")
-        
         data = payload.get("data", {})
         order_code = str(data.get("orderCode", ""))
-        status_code = data.get("code", "")
+        code = payload.get("code", "")
         
         # Only process successful payments
-        if status_code != "00":
-            logging.info(f"Payment not successful, code: {status_code}")
-            return {"message": "Acknowledged"}
+        if code != "00":
+            logging.info(f"Payment not successful, code: {code}")
+            return {"success": True, "message": "Acknowledged"}
         
-        # Extract user_id from orderCode (format: {timestamp}{user_id_short})
-        # We store the mapping in the description or use a lookup
         description = data.get("description", "")
         
-        # Find user by searching for pending order
-        from apps.api.modules.credits.models import CreditPackage
+        # Extract user_id and package_id from description
+        # Format: "CR{package_id} {user_id_short}"
+        user_id_short, package_id = _extract_info_from_description(description)
         
-        # The orderCode is stored as payos_order_id in a pending package
-        # or we extract user_id from the description
-        user_id = _extract_user_id_from_description(description)
-        if not user_id:
-            logging.error(f"Could not extract user_id from description: {description}")
-            return {"message": "Acknowledged"}
+        if not user_id_short or not package_id:
+            logging.error(f"Could not extract info from description: {description}")
+            return {"success": False, "message": "Invalid description"}
         
-        user = db.query(User).filter(User.id == user_id).first()
+        # Find user by partial ID match
+        user = db.query(User).filter(User.id.startswith(user_id_short)).first()
         if not user:
             logging.error(f"User not found: {user_id}")
-            return {"message": "Acknowledged"}
+            return {"success": False, "message": "User not found"}
         
         # Check if already processed (idempotency)
+        from apps.api.modules.credits.models import CreditPackage
         existing = db.query(CreditPackage).filter(
             CreditPackage.payos_order_id == order_code
         ).first()
         if existing:
             logging.info(f"Order {order_code} already processed")
-            return {"message": "Already processed"}
+            return {"success": True, "message": "Already processed"}
         
         # Create credit package
-        purchase_credits(user, db, payos_order_id=order_code)
+        purchase_credits(user, db, package_id, payos_order_id=order_code)
         logging.info(f"Credits purchased for user {user.id}, order {order_code}")
         
-        return {"message": "Success"}
+        return {"success": True, "message": "Credits added successfully"}
         
     except HTTPException:
         raise
     except Exception as e:
         logging.exception("Error processing PayOS webhook")
-        raise HTTPException(status_code=500, detail=str(e))
+        return {"success": False, "message": str(e)}
 
 
-def _extract_user_id_from_description(description: str) -> str:
+def _extract_info_from_description(description: str) -> tuple:
     """
-    Extract user_id from PayOS description.
-    Format: "GENWEAR_{user_id}"
+    Extract user_id and package_id from PayOS description.
+    Format: "CR{package_id} {user_id_short}"
+    Returns: (user_id, package_id)
     """
-    if description and description.startswith("GENWEAR_"):
-        return description.replace("GENWEAR_", "")
-    return ""
+    try:
+        if description and description.startswith("CR"):
+            parts = description.split(" ")
+            if len(parts) >= 2:
+                # Extract package_id from CR1, CR2, etc
+                package_id = int(parts[0].replace("CR", ""))
+                # Get partial user_id
+                user_id_short = parts[1]
+                return user_id_short, package_id
+    except Exception as e:
+        logging.error(f"Error parsing description: {e}")
+    
+    return None, None

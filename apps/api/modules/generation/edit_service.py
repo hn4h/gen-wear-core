@@ -17,7 +17,7 @@ def _bytes_to_png(image_bytes: bytes, upload_dir: str) -> str:
     filepath = os.path.join(upload_dir, filename)
     with open(filepath, "wb") as f:
         f.write(image_bytes)
-    api_base = os.getenv("API_BASE_URL", "http://localhost:8000")
+    api_base = os.getenv("API_BASE_URL", "https://api.genwear.io.vn")
     return f"{api_base}/static/designs/{filename}"
 
 

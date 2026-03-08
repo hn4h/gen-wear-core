@@ -15,22 +15,22 @@ import os
 
 app = FastAPI(title="Gen Wear API", redirect_slashes=False)
 
-# CORS Config
-# origins = [
-#     "http://localhost:3000",
-# ]
-
+# CORS Config - Allow frontend origins
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "https://genwear.io.vn",
+        "https://www.genwear.io.vn",
+        "https://api.genwear.io.vn",
         "http://localhost:3000",
         "http://localhost:3001",
         "http://127.0.0.1:3000",
     ],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
+    expose_headers=["*"],
+    max_age=3600,
 )
 
 # Celery Config

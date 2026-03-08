@@ -21,10 +21,10 @@ from fastapi import HTTPException
 def generate_pattern(
     request: GenerateRequest,
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_optional_current_user),
+    current_user: User = Depends(get_current_user),
 ):
     try:
-        result = generate_pattern_service(request.prompt)
+        result = generate_pattern_service(request.prompt, current_user, db)
         # ── Log every generation attempt ──────────────────────────────────────
         log = AIGenerationLog(
             user_id=current_user.id if current_user else None,

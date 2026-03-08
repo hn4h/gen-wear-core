@@ -14,6 +14,12 @@ class User(Base):
     account_tier = Column(String, default="FREE", nullable=False)  # "FREE" or "PRO"
     daily_credits_remaining = Column(Integer, default=5, nullable=False)
     daily_credits_reset_at = Column(DateTime, nullable=True)
+    
+    # PRO Subscription fields
+    pro_subscription_start = Column(DateTime, nullable=True)
+    pro_subscription_end = Column(DateTime, nullable=True)
+    pro_subscription_status = Column(String, default="INACTIVE", nullable=False)  # "INACTIVE", "ACTIVE", "EXPIRED"
+    
     created_at = Column(DateTime, default=datetime.utcnow)
     is_active = Column(Boolean, default=True)
     

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { StudioLeftPanel } from "./StudioLeftPanel";
 import { StudioCanvas } from "./StudioCanvas";
@@ -10,15 +10,45 @@ import { useRegionEdit } from "../hooks/useRegionEdit";
 import { Header } from "@/src/components/layout/Header";
 import { useDesignOrderStore } from "@/src/lib/useDesignOrderStore";
 import { designsAPI } from "@/src/services/designs";
-import { getAuthToken } from "@/src/lib/useAuthStore";
+import { getAuthToken, useAuthStore } from "@/src/lib/useAuthStore";
+import { authAPI } from "@/src/services/auth";
 
 export function StudioLayout() {
     const router = useRouter();
+    const { user, setUser } = useAuthStore();
     const { setDesign } = useDesignOrderStore();
     const [selectedStyle, setSelectedStyle] = useState("");
     const [show3DPreview, setShow3DPreview] = useState(false);
     const [maskBase64, setMaskBase64] = useState<string | null>(null);
     const [isSaving, setIsSaving] = useState(false);
+    const [isLoadingCredits, setIsLoadingCredits] = useState(true);
+    
+    // Check auth and fetch credits on mount
+    useEffect(() => {
+        const checkAuthAndFetchCredits = async () => {
+            const token = getAuthToken();
+            
+            if (!token) {
+                console.log('[StudioLayout] No token found, redirecting to login');
+                router.push("/login?redirect=/studio");
+                return;
+            }
+            
+            try {
+                console.log('[StudioLayout] Fetching user credits...');
+                const userData = await authAPI.getCurrentUser();
+                setUser(userData);
+                console.log('[StudioLayout] Credits loaded:', userData.daily_credits_remaining);
+            } catch (error) {
+                console.error('[StudioLayout] Failed to fetch user:', error);
+                router.push("/login?redirect=/studio");
+            } finally {
+                setIsLoadingCredits(false);
+            }
+        };
+        
+        checkAuthAndFetchCredits();
+    }, [router, setUser]);
     
     // Design generation hook
     const {
@@ -145,13 +175,13 @@ export function StudioLayout() {
                     isSaving={isSaving}
                 />
 
-                {/* Right Panel - Canvas */}
                 <StudioCanvas
                     imageUrl={displayedImage}
                     region={region}
                     onRegionChange={setRegion}
                     onMaskGenerated={handleMaskGenerated}
                     isLoading={isGenerating}
+                    isFreeTier={user?.account_tier === "FREE"}
                 />
             </div>
 

@@ -27,11 +27,13 @@ export function Header() {
     }
   }, [user, fetchCart]);
 
-  // Check valid session on mount
+  // Check valid session on mount and refresh profile
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        if (!user && localStorage.getItem('auth_token')) {
+        const storeToken = useAuthStore.getState().token;
+        const localToken = localStorage.getItem('auth_token');
+        if (storeToken || localToken) {
           const userData = await authAPI.getCurrentUser();
           setUser(userData);
         }
@@ -41,7 +43,7 @@ export function Header() {
       }
     };
     checkAuth();
-  }, [user, setUser, logout]);
+  }, [setUser, logout]);
 
   // Handle scroll effect
   useEffect(() => {
