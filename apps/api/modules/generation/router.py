@@ -45,7 +45,6 @@ def edit_region(
     db: Session = Depends(get_db)
 ):
     if current_user.account_tier == "FREE":
-        from fastapi import HTTPException
         raise HTTPException(status_code=403, detail="Tính năng chỉnh sửa vùng ảnh chỉ dành cho tài khoản Pro.")
     """
     Edit a region of an existing image based on a mask and prompt.

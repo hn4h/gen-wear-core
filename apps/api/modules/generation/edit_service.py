@@ -21,7 +21,7 @@ def _bytes_to_png(image_bytes: bytes, upload_dir: str) -> str:
     return f"{api_base}/static/designs/{filename}"
 
 
-def edit_region_service(image_base64: str, mask_base64: str, prompt: str) -> dict:
+def edit_region_service(image_base64: str, mask_base64: str, prompt: str, user: User, db: Session) -> dict:
     """
     Edit a region of the image based on the mask and prompt.
 
@@ -29,6 +29,8 @@ def edit_region_service(image_base64: str, mask_base64: str, prompt: str) -> dic
         image_base64: Original image as base64 string (without data URI prefix)
         mask_base64:  Mask image as base64 string (white = area to edit)
         prompt:       Description of the edit to apply
+        user:         Current user for credit deduction and tier processing
+        db:           Database session
 
     Returns:
         dict with 'url' pointing to the saved PNG file
@@ -97,9 +99,13 @@ def edit_region_service(image_base64: str, mask_base64: str, prompt: str) -> dic
             edited_base64 = resize_for_tier(edited_base64, user.account_tier)
             if user.account_tier == "FREE":
                 edited_base64 = apply_watermark(edited_base64)
-            image_url = _bytes_to_png(edited_bytes, upload_dir)
+            
+            # Convert base64 back to bytes and save as PNG
+            final_image_bytes = base64.b64decode(edited_base64)
+            image_url = _bytes_to_png(final_image_bytes, upload_dir)
+            
             return {
-                "url": f"data:image/png;base64,{edited_base64}",
+                "url": image_url,
                 "prompt": enhanced_prompt
             }
             
@@ -142,7 +148,9 @@ def edit_region_service(image_base64: str, mask_base64: str, prompt: str) -> dic
             if user.account_tier == "FREE":
                 generated_base64 = apply_watermark(generated_base64)
             
-            image_url = _bytes_to_png(generated_bytes, upload_dir)
+            # Convert base64 back to bytes and save as PNG
+            final_image_bytes = base64.b64decode(generated_base64)
+            image_url = _bytes_to_png(final_image_bytes, upload_dir)
 
             return {
                 "url": image_url,
