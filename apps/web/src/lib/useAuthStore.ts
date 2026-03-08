@@ -6,6 +6,8 @@ export interface User {
   phone_number: string;
   full_name: string;
   role?: string;
+  account_tier?: string;
+  daily_credits_remaining?: number;
   created_at: string;
   is_active: boolean;
 }
@@ -28,10 +30,18 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       token: null,
       isAuthenticated: false,
-      setUser: (user) => set({ user, isAuthenticated: !!user }),
+      setUser: (user) => {
+        // console.log('[useAuthStore.setUser] Received user:', user);
+        // console.log('[useAuthStore.setUser] daily_credits_remaining:', user?.daily_credits_remaining);
+        set({ user, isAuthenticated: !!user });
+        // console.log('[useAuthStore.setUser] Store updated');
+      },
       setToken: (token) => set({ token }),
       login: (user, token) => {
+        // console.log('[useAuthStore.login] Received user:', user);
+        // console.log('[useAuthStore.login] daily_credits_remaining:', user?.daily_credits_remaining);
         set({ user, token, isAuthenticated: true });
+        // console.log('[useAuthStore.login] Store updated');
       },
       logout: () => {
         set({ user: null, token: null, isAuthenticated: false });

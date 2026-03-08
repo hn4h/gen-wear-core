@@ -2,7 +2,7 @@ import axios from 'axios';
 import { getAuthToken } from '@/src/lib/useAuthStore';
 import { Product } from '@/src/services/products';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.genwear.io.vn';
 
 export interface CartItemResponse {
     id: string;

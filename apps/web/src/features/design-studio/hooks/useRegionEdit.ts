@@ -1,7 +1,9 @@
 import { useState, useCallback } from "react";
 import { useAuthStore } from "@/src/lib/useAuthStore";
+import { authAPI } from "@/src/services/auth";
+import { toast } from "react-hot-toast";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.genwear.io.vn';
 
 export interface RegionSelection {
     x: number;
@@ -25,7 +27,7 @@ export function useRegionEdit(): UseRegionEditReturn {
     const [region, setRegion] = useState<RegionSelection | null>(null);
     const [isApplying, setIsApplying] = useState(false);
 
-    const { token } = useAuthStore();
+    const { token, setUser } = useAuthStore();
 
     const clearRegion = useCallback(() => {
         setRegion(null);
@@ -57,10 +59,31 @@ export function useRegionEdit(): UseRegionEditReturn {
             if (!response.ok) {
                 const errorText = await response.text();
                 console.error("Edit API Error:", response.status, errorText);
+                let errorMessage = "Lỗi khi chỉnh sửa.";
+                try {
+                    const parsedError = JSON.parse(errorText);
+                    if (parsedError.detail) {
+                        errorMessage = parsedError.detail;
+                    }
+                } catch (e) {
+                    // ignore
+                }
+                toast.error(errorMessage);
                 throw new Error(`API responded with status ${response.status}: ${errorText}`);
             }
 
             const data = await response.json();
+            
+            // Refresh user credits
+            if (data.url) {
+                try {
+                    const updatedUser = await authAPI.getCurrentUser();
+                    setUser(updatedUser);
+                } catch (e) {
+                    console.error("Failed to refresh user data:", e);
+                }
+            }
+            
             return data.url || null;
         } catch (error) {
             console.error("Failed to apply edit:", error);
@@ -69,7 +92,7 @@ export function useRegionEdit(): UseRegionEditReturn {
         } finally {
             setIsApplying(false);
         }
-    }, [editPrompt]);
+    }, [editPrompt, token, setUser]);
 
     return {
         editPrompt,

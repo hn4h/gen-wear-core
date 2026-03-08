@@ -2,7 +2,7 @@ import { Product } from '@/src/services/products';
 import { getAuthToken } from '@/src/lib/useAuthStore';
 import axios from 'axios';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.genwear.io.vn';
 
 export const adminProductsAPI = {
     createProduct: async (data: any) => {

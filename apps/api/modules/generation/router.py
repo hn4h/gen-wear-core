@@ -6,6 +6,8 @@ from .models import AIGenerationLog
 from apps.api.modules.auth.database import get_db
 from apps.api.modules.auth.service import get_optional_current_user, get_current_user
 from apps.api.modules.auth.models import User
+from apps.api.modules.auth.database import get_db
+from sqlalchemy.orm import Session
 from sqlalchemy.orm import Session
 from typing import Optional
 
@@ -19,10 +21,10 @@ from fastapi import HTTPException
 def generate_pattern(
     request: GenerateRequest,
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_optional_current_user),
+    current_user: User = Depends(get_current_user),
 ):
     try:
-        result = generate_pattern_service(request.prompt)
+        result = generate_pattern_service(request.prompt, current_user, db)
         # ── Log every generation attempt ──────────────────────────────────────
         log = AIGenerationLog(
             user_id=current_user.id if current_user else None,
@@ -39,8 +41,12 @@ def generate_pattern(
 @router.post("/edit")
 def edit_region(
     request: RegionEditRequest,
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
 ):
+    if current_user.account_tier == "FREE":
+        from fastapi import HTTPException
+        raise HTTPException(status_code=403, detail="Tính năng chỉnh sửa vùng ảnh chỉ dành cho tài khoản Pro.")
     """
     Edit a region of an existing image based on a mask and prompt.
 
@@ -52,7 +58,9 @@ def edit_region(
         return edit_region_service(
             request.image_base64,
             request.mask_base64,
-            request.prompt
+            request.prompt,
+            current_user,
+            db
         )
     except Exception as e:
         logging.exception("Error editing region")

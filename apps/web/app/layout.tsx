@@ -10,6 +10,7 @@ export const metadata: Metadata = {
 };
 
 import { CartSheet } from "@/src/components/cart/CartSheet";
+import { Toaster } from "react-hot-toast";
 
 // ...
 
@@ -21,6 +22,7 @@ export default function RootLayout({
     return (
         <html lang="en" suppressHydrationWarning>
             <body className={inter.className} suppressHydrationWarning>
+                <Toaster position="top-right" />
                 {children}
                 <CartSheet />
             </body>

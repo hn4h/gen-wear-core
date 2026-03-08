@@ -3,6 +3,7 @@
 import { useRef, useState, useCallback, useEffect, MouseEvent } from "react";
 import { RegionSelection } from "../hooks/useRegionEdit";
 import { Square, PenTool, Trash2 } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 // Cast icons
 const SquareIcon = Square as any;
@@ -22,6 +23,7 @@ interface StudioCanvasProps {
     onRegionChange: (region: RegionSelection | null) => void;
     onMaskGenerated: (maskBase64: string | null) => void;
     isLoading: boolean;
+    isFreeTier?: boolean;
 }
 
 export function StudioCanvas({ 
@@ -29,7 +31,8 @@ export function StudioCanvas({
     region, 
     onRegionChange, 
     onMaskGenerated,
-    isLoading 
+    isLoading,
+    isFreeTier = false
 }: StudioCanvasProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -223,6 +226,12 @@ export function StudioCanvas({
     }, []);
 
     const handleMouseDown = useCallback((e: MouseEvent<HTMLCanvasElement>) => {
+        if (isFreeTier) {
+            // Hiển thị alert nếu là tài khoản Free
+            toast.error("Tính năng này chỉ dành cho bản Pro. Vui lòng nâng cấp!");
+            return;
+        }
+
         const pos = getCanvasPosition(e);
         if (!pos) return;
 
@@ -235,7 +244,7 @@ export function StudioCanvas({
             // Freeform - start new path
             setPathPoints([pos]);
         }
-    }, [getCanvasPosition, onRegionChange, drawingMode]);
+    }, [getCanvasPosition, onRegionChange, drawingMode, isFreeTier]);
 
     const handleMouseMove = useCallback((e: MouseEvent<HTMLCanvasElement>) => {
         if (!isDrawing) return;
@@ -305,7 +314,7 @@ export function StudioCanvas({
                 
                 <div className="flex items-center gap-2">
                     {/* Drawing Mode Toggle */}
-                    {imageUrl && !isLoading && (
+                    {imageUrl && !isLoading && !isFreeTier && (
                         <>
                             <div className="flex bg-slate-700/50 rounded-lg p-1 gap-1">
                                 <button
@@ -368,7 +377,7 @@ export function StudioCanvas({
                         <canvas
                             ref={canvasRef}
                             className={`absolute top-0 left-0 w-full h-full rounded-lg ${
-                                drawingMode === "freeform" ? "cursor-crosshair" : "cursor-crosshair"
+                                isFreeTier ? "cursor-not-allowed" : "cursor-crosshair"
                             }`}
                             onMouseDown={handleMouseDown}
                             onMouseMove={handleMouseMove}
@@ -399,7 +408,7 @@ export function StudioCanvas({
             </div>
 
             {/* Canvas Footer - Instructions */}
-            {imageUrl && !isLoading && (
+            {imageUrl && !isLoading && !isFreeTier && (
                 <div className="p-4 border-t border-white/10 bg-slate-800/50">
                     <p className="text-sm text-gray-400 text-center">
                         💡 {drawingMode === "rectangle" 

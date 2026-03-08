@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
 from celery import Celery
 import os
 from apps.api.modules.generation.router import router as generation_router
@@ -15,23 +17,33 @@ import os
 
 app = FastAPI(title="Gen Wear API", redirect_slashes=False)
 
-# CORS Config
-# origins = [
-#     "http://localhost:3000",
-# ]
-
+# CORS Config - Allow frontend origins
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://genwear.io.vn",
-        "http://localhost:3000",
-        "http://localhost:3001",
-        "http://127.0.0.1:3000",
+        "*",  # Allow all origins for static file access in WebGL contexts
     ],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
+    expose_headers=["*"],
+    max_age=3600,
 )
+
+# Custom middleware to add additional CORS headers for static files  
+class StaticFilesCORSMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        # Ensure static files have proper CORS for WebGL/Canvas
+        if request.url.path.startswith("/static/"):
+            response.headers["Access-Control-Allow-Origin"] = "*"
+            response.headers["Access-Control-Allow-Methods"] = "GET, HEAD, OPTIONS"
+            response.headers["Access-Control-Allow-Headers"] = "*"
+            response.headers["Cross-Origin-Resource-Policy"] = "cross-origin"
+        return response
+
+# Add after CORSMiddleware (this runs first due to middleware order)
+app.add_middleware(StaticFilesCORSMiddleware)
 
 # Celery Config
 redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
@@ -60,6 +72,10 @@ app.include_router(admin_router, prefix="/api/admin", tags=["admin"])
 
 from apps.api.modules.cart.router import router as cart_router
 from apps.api.modules.orders.router import router as orders_router
+from apps.api.modules.credits.router import router as credits_router
+
+
+app.include_router(credits_router, prefix="/api/credits", tags=["credits"])
 from apps.api.modules.designs.router import router as designs_router
 
 app.include_router(cart_router, prefix="/api/cart", tags=["cart"])

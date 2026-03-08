@@ -57,8 +57,32 @@ class UserResponse(BaseModel):
     phone_number: str
     full_name: str
     role: str
+    account_tier: str
+    daily_credits_remaining: int
+    pro_subscription_status: str
+    pro_subscription_end: Optional[datetime] = None
     created_at: datetime
     is_active: bool
+    
+    class Config:
+        from_attributes = True
+
+class UpgradeToProRequest(BaseModel):
+    return_url: str = Field(..., description="URL to redirect after payment success")
+    cancel_url: str = Field(..., description="URL to redirect if payment is cancelled")
+
+class UpgradeToProResponse(BaseModel):
+    checkout_url: str
+    order_code: str
+    amount: int
+    description: str
+
+class SubscriptionStatusResponse(BaseModel):
+    account_tier: str
+    subscription_status: str
+    subscription_start: Optional[datetime] = None
+    subscription_end: Optional[datetime] = None
+    days_remaining: Optional[int] = None
     
     class Config:
         from_attributes = True

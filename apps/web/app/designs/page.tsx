@@ -16,28 +16,25 @@ const ImageIcon = ImageIconLucide as any;
 
 export default function SavedDesignsPage() {
     const router = useRouter();
-    const { user } = useAuthStore();
+    const { user, isAuthenticated, hasHydrated } = useAuthStore();
     const { setDesign } = useDesignOrderStore();
     
     const [designs, setDesigns] = useState<SavedDesign[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [deletingId, setDeletingId] = useState<string | null>(null);
-    const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
-        setMounted(true);
-    }, []);
-
-    useEffect(() => {
-        if (!mounted) return;
+        // Wait for Zustand to hydrate from localStorage
+        if (!hasHydrated) return;
         
-        if (!user) {
+        // Redirect to login if not authenticated
+        if (!isAuthenticated) {
             router.push('/login?redirect=/designs');
             return;
         }
 
         fetchDesigns();
-    }, [user, mounted, router]);
+    }, [hasHydrated, isAuthenticated, router]);
 
     const fetchDesigns = async () => {
         try {
@@ -74,7 +71,7 @@ export default function SavedDesignsPage() {
         router.push('/checkout?type=design');
     };
 
-    if (!mounted || isLoading) {
+    if (!hasHydrated || isLoading) {
         return (
             <div className="min-h-screen bg-slate-900 flex items-center justify-center">
                 <Loader2Icon className="w-8 h-8 animate-spin text-purple-500" />

@@ -27,11 +27,13 @@ export function Header() {
     }
   }, [user, fetchCart]);
 
-  // Check valid session on mount
+  // Check valid session on mount and refresh profile
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        if (!user && localStorage.getItem('auth_token')) {
+        const storeToken = useAuthStore.getState().token;
+        const localToken = localStorage.getItem('auth_token');
+        if (storeToken || localToken) {
           const userData = await authAPI.getCurrentUser();
           setUser(userData);
         }
@@ -41,7 +43,7 @@ export function Header() {
       }
     };
     checkAuth();
-  }, [user, setUser, logout]);
+  }, [setUser, logout]);
 
   // Handle scroll effect
   useEffect(() => {
@@ -106,7 +108,14 @@ export function Header() {
                  </button>
                 <div className="flex items-center gap-3 pl-4 border-l border-white/10">
                     <div className="text-right hidden lg:block">
-                        <p className="text-sm font-medium text-white">{user.full_name}</p>
+                        <div className="flex items-center justify-end gap-2 mb-1">
+                            <p className="text-sm font-medium text-white">{user.full_name}</p>
+                            {user.account_tier === 'PRO' ? (
+                                <Link href="/pricing" className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:opacity-80 transition-opacity">PRO</Link>
+                            ) : (
+                                <Link href="/pricing" className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-300 hover:bg-slate-600 transition-colors">FREE</Link>
+                            )}
+                        </div>
                         {user.role === 'ADMIN' && (
                             <Link href="/admin" className="block text-xs text-pink-400 hover:text-pink-300 font-bold mb-1">
                                 Admin Dashboard
@@ -182,7 +191,14 @@ export function Header() {
                             {user.full_name.charAt(0)}
                         </div>
                         <div>
-                            <p className="font-medium text-white">{user.full_name}</p>
+                            <div className="flex items-center gap-2 mb-1">
+                                <p className="font-medium text-white">{user.full_name}</p>
+                                {user.account_tier === 'PRO' ? (
+                                    <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-gradient-to-r from-purple-500 to-pink-500 text-white">PRO</span>
+                                ) : (
+                                    <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-300">FREE</span>
+                                )}
+                            </div>
                             <p className="text-sm text-gray-400">{user.phone_number}</p>
                             {user.role === 'ADMIN' && (
                                 <Link href="/admin" className="block text-sm text-pink-400 font-bold mt-1">

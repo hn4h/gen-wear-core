@@ -29,6 +29,7 @@ def init_db():
     from apps.api.modules.cart.models import Cart, CartItem
     from apps.api.modules.orders.models import Order, OrderItem
     from apps.api.modules.products.models import Product
+    from apps.api.modules.credits.models import CreditPackage, CreditTransaction
     from apps.api.modules.designs.models import SavedDesign
     from apps.api.modules.blog.models import BlogPost, BlogComment, BlogLike
     from apps.api.modules.generation.models import AIGenerationLog
