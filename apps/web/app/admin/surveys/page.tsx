@@ -14,8 +14,10 @@ import {
     Mail,
     Calendar,
     MessageSquare,
-    Filter
+    Filter,
+    BarChart3
 } from 'lucide-react';
+import Link from 'next/link';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.genwear.io.vn';
 
@@ -31,6 +33,7 @@ const MailIcon = Mail as any;
 const CalendarIcon = Calendar as any;
 const MessageSquareIcon = MessageSquare as any;
 const FilterIcon = Filter as any;
+const BarChart3Icon = BarChart3 as any;
 
 interface SurveyResponse {
     id: string;
@@ -137,12 +140,21 @@ export default function SurveysPage() {
                         Tổng số: {data?.total || 0} khảo sát
                     </p>
                 </div>
-                <button 
-                    onClick={() => loadSurveys()}
-                    className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl transition-colors"
-                >
-                    Làm mới
-                </button>
+                <div className="flex items-center gap-3">
+                    <Link 
+                        href="/admin/surveys/analytics"
+                        className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-xl transition-all flex items-center gap-2"
+                    >
+                        <BarChart3Icon className="w-4 h-4" />
+                        Xem thống kê
+                    </Link>
+                    <button 
+                        onClick={() => loadSurveys()}
+                        className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl transition-colors"
+                    >
+                        Làm mới
+                    </button>
+                </div>
             </div>
 
             {/* Filters */}

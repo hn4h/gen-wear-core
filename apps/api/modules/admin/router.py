@@ -304,3 +304,85 @@ async def delete_survey_response(
     
     db.delete(response)
     db.commit()
+
+
+@router.get("/surveys/analytics")
+async def get_survey_analytics(
+    db: Session = Depends(get_db),
+    admin: User = Depends(get_current_admin_user)
+):
+    """Get detailed survey analytics for charts (Admin only)"""
+    from collections import Counter
+    
+    # Define question titles
+    QUESTION_TITLES = {
+        'question_1': 'Trải nghiệm tổng thể từ thiết kế → thanh toán',
+        'question_2': 'Phiên bản Free và Pro',
+        'question_3': 'Đánh giá về website GenWear'
+    }
+    
+    # Get all survey responses
+    responses = db.query(SurveyResponse).all()
+    total_responses = len(responses)
+    
+    if total_responses == 0:
+        return {
+            "total_responses": 0,
+            "rating_distribution": {},
+            "question_1_stats": {},
+            "question_2_stats": {},
+            "question_3_stats": {},
+            "question_titles": QUESTION_TITLES,
+            "avg_rating": 0,
+            "responses_over_time": []
+        }
+    
+    # Rating distribution
+    ratings = [r.rating for r in responses if r.rating]
+    rating_distribution = dict(Counter(ratings))
+    avg_rating = sum(ratings) / len(ratings) if ratings else 0
+    
+    # Question 1 statistics (count occurrences of each answer)
+    q1_answers = [r.question_1_answer for r in responses if r.question_1_answer]
+    q1_stats = dict(Counter(q1_answers))
+    
+    # Question 2 statistics
+    q2_answers = [r.question_2_answer for r in responses if r.question_2_answer]
+    q2_stats = dict(Counter(q2_answers))
+    
+    # Question 3 statistics
+    q3_answers = [r.question_3_answer for r in responses if r.question_3_answer]
+    q3_stats = dict(Counter(q3_answers))
+    
+    # Responses over time (last 30 days)
+    from datetime import datetime, timedelta
+    now = datetime.utcnow()
+    last_30_days = now - timedelta(days=30)
+    
+    recent_responses = [r for r in responses if r.created_at >= last_30_days]
+    
+    # Group by date
+    date_counts = {}
+    for r in recent_responses:
+        date_key = r.created_at.strftime('%Y-%m-%d')
+        date_counts[date_key] = date_counts.get(date_key, 0) + 1
+    
+    # Fill in missing dates with 0
+    responses_over_time = []
+    for i in range(30):
+        date = (now - timedelta(days=29-i)).strftime('%Y-%m-%d')
+        responses_over_time.append({
+            "date": date,
+            "count": date_counts.get(date, 0)
+        })
+    
+    return {
+        "total_responses": total_responses,
+        "rating_distribution": rating_distribution,
+        "question_1_stats": q1_stats,
+        "question_2_stats": q2_stats,
+        "question_3_stats": q3_stats,
+        "question_titles": QUESTION_TITLES,
+        "avg_rating": round(avg_rating, 2),
+        "responses_over_time": responses_over_time
+    }

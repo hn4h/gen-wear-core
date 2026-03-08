@@ -69,12 +69,13 @@ FEEDBACK_OPTIONS = [
 ]
 
 # Rating distribution (weighted) - tương ứng với Q4
+# Phân bố tốt hơn: nhiều đánh giá cao, ít đánh giá thấp
 RATING_WEIGHTS = [
-    (5, 28),  # 28% cho 5 sao (Rất đẹp và sáng tạo)
-    (4, 36),  # 36% cho 4 sao (Đẹp, có tính nghệ thuật)
-    (3, 20),  # 20% cho 3 sao (Khá ổn, dùng được)
-    (2, 12),  # 12% cho 2 sao (Chưa thật sự nổi bật)
-    (1, 4)    # 4% cho 1 sao (Cần chỉnh sửa thêm)
+    (5, 45),  # 45% cho 5 sao (Rất đẹp và sáng tạo) - NHIỀU
+    (4, 35),  # 35% cho 4 sao (Đẹp, có tính nghệ thuật) - NHIỀU
+    (3, 15),  # 15% cho 3 sao (Khá ổn, dùng được) - VỪA
+    (2, 4),   # 4% cho 2 sao (Chưa thật sự nổi bật) - ÍT
+    (1, 1)    # 1% cho 1 sao (Cần chỉnh sửa thêm) - RẤT ÍT
 ]
 
 def get_weighted_rating():
@@ -103,6 +104,12 @@ def create_fake_surveys():
     db = SessionLocal()
     
     try:
+        # XÓA TẤT CẢ SURVEY CŨ TRƯỚC
+        print("🗑️  Đang xóa tất cả survey responses cũ...")
+        deleted_count = db.query(SurveyResponse).delete()
+        db.commit()
+        print(f"✅ Đã xóa {deleted_count} survey responses cũ")
+        
         # Tạo survey template nếu chưa có
         existing_survey = db.query(Survey).filter(Survey.id == 'general-feedback').first()
         if not existing_survey:
@@ -123,8 +130,8 @@ def create_fake_surveys():
             print("Không có user nào để tạo survey!")
             return
         
-        print(f"Tìm thấy {len(users)} users (không bao gồm admin)")
-        
+        print(30 survey responses (nhiều hơn để có data đẹp)
+        num_surveys = 30
         # Thời gian bắt đầu và kết thúc
         start_date = datetime(2026, 2, 23, 0, 0, 0)
         end_date = datetime(2026, 3, 9, 23, 59, 59)
