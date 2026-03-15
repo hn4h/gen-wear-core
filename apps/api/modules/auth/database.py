@@ -34,5 +34,6 @@ def init_db():
     from apps.api.modules.blog.models import BlogPost, BlogComment, BlogLike
     from apps.api.modules.generation.models import AIGenerationLog
     from apps.api.modules.survey.models import Survey, SurveyResponse
+    from apps.api.modules.payment.models import ProcessedPaymentEvent
     Base.metadata.create_all(bind=engine)
 

@@ -151,11 +151,13 @@ def get_current_admin_user(
         )
     return current_user
 
-def upgrade_to_pro(db: Session, user: User, duration_days: int = 30) -> User:
+def upgrade_to_pro(db: Session, user: User, duration_days: int = 30, commit: bool = True) -> User:
     """Upgrade user to PRO tier"""
     from datetime import timedelta
+    from zoneinfo import ZoneInfo
     
     now = datetime.utcnow()
+    vn_now = datetime.now(ZoneInfo("Asia/Ho_Chi_Minh"))
     
     # If already PRO and active, extend the subscription
     if user.account_tier == "PRO" and user.pro_subscription_status == "ACTIVE":
@@ -174,15 +176,22 @@ def upgrade_to_pro(db: Session, user: User, duration_days: int = 30) -> User:
         user.pro_subscription_end = now + timedelta(days=duration_days)
     
     # Reset daily credits for PRO tier (PRO users get 20 daily credits)
+    # Set to next midnight Vietnam time for proper daily reset
     user.daily_credits_remaining = 20
-    user.daily_credits_reset_at = now + timedelta(days=1)
+    user.daily_credits_reset_at = vn_now.replace(
+        hour=0, minute=0, second=0, microsecond=0
+    ) + timedelta(days=1)
     
-    db.commit()
-    db.refresh(user)
+    if commit:
+        db.commit()
+        db.refresh(user)
     return user
 
 def check_and_update_subscription_status(db: Session, user: User) -> User:
     """Check and update user subscription status if expired"""
+    from datetime import timedelta
+    from zoneinfo import ZoneInfo
+    
     now = datetime.utcnow()
     
     if user.account_tier == "PRO" and user.pro_subscription_end:
@@ -190,8 +199,12 @@ def check_and_update_subscription_status(db: Session, user: User) -> User:
             # Subscription expired
             user.pro_subscription_status = "EXPIRED"
             user.account_tier = "FREE"
-            # Reset daily credits to FREE tier limit
+            # Reset daily credits to FREE tier limit with proper reset time
+            vn_now = datetime.now(ZoneInfo("Asia/Ho_Chi_Minh"))
             user.daily_credits_remaining = 5
+            user.daily_credits_reset_at = vn_now.replace(
+                hour=0, minute=0, second=0, microsecond=0
+            ) + timedelta(days=1)
             db.commit()
             db.refresh(user)
     

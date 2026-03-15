@@ -6,13 +6,11 @@ from apps.api.modules.auth.database import get_db
 from apps.api.modules.credits.service import (
     get_credit_balance,
     get_credit_history,
-    purchase_credits,
     get_available_packages,
     CREDIT_PACKAGES
 )
 from apps.api.modules.credits.payos_service import (
-    create_payment_link_for_package,
-    verify_webhook_signature
+    create_payment_link_for_package
 )
 from apps.api.modules.credits.schemas import (
     PurchaseCreditsRequest,
@@ -107,77 +105,7 @@ def create_purchase(
 
 @router.post("/webhook")
 async def payos_webhook(request: Request, db: Session = Depends(get_db)):
-    """
-    PayOS webhook callback khi thanh toán thành công.
-    PayOS sẽ gọi endpoint này tự động.
-    """
-    try:
-        payload = await request.json()
-        logging.info(f"PayOS webhook received: {payload}")
-        
-        data = payload.get("data", {})
-        order_code = str(data.get("orderCode", ""))
-        code = payload.get("code", "")
-        
-        # Only process successful payments
-        if code != "00":
-            logging.info(f"Payment not successful, code: {code}")
-            return {"success": True, "message": "Acknowledged"}
-        
-        description = data.get("description", "")
-        
-        # Extract user_id and package_id from description
-        # Format: "CR{package_id} {user_id_short}"
-        user_id_short, package_id = _extract_info_from_description(description)
-        
-        if not user_id_short or not package_id:
-            logging.error(f"Could not extract info from description: {description}")
-            return {"success": False, "message": "Invalid description"}
-        
-        # Find user by partial ID match
-        user = db.query(User).filter(User.id.startswith(user_id_short)).first()
-        if not user:
-            logging.error(f"User not found: {user_id}")
-            return {"success": False, "message": "User not found"}
-        
-        # Check if already processed (idempotency)
-        from apps.api.modules.credits.models import CreditPackage
-        existing = db.query(CreditPackage).filter(
-            CreditPackage.payos_order_id == order_code
-        ).first()
-        if existing:
-            logging.info(f"Order {order_code} already processed")
-            return {"success": True, "message": "Already processed"}
-        
-        # Create credit package
-        purchase_credits(user, db, package_id, payos_order_id=order_code)
-        logging.info(f"Credits purchased for user {user.id}, order {order_code}")
-        
-        return {"success": True, "message": "Credits added successfully"}
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        logging.exception("Error processing PayOS webhook")
-        return {"success": False, "message": str(e)}
+    """Backward-compatible endpoint that delegates to the unified PayOS webhook."""
+    from apps.api.modules.payment.router import payos_webhook as unified_payos_webhook
 
-
-def _extract_info_from_description(description: str) -> tuple:
-    """
-    Extract user_id and package_id from PayOS description.
-    Format: "CR{package_id} {user_id_short}"
-    Returns: (user_id, package_id)
-    """
-    try:
-        if description and description.startswith("CR"):
-            parts = description.split(" ")
-            if len(parts) >= 2:
-                # Extract package_id from CR1, CR2, etc
-                package_id = int(parts[0].replace("CR", ""))
-                # Get partial user_id
-                user_id_short = parts[1]
-                return user_id_short, package_id
-    except Exception as e:
-        logging.error(f"Error parsing description: {e}")
-    
-    return None, None
+    return await unified_payos_webhook(request=request, db=db)

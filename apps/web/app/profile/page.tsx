@@ -1,18 +1,37 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Header } from '@/src/components/layout/Header';
 import { Footer } from '@/src/components/layout/Footer';
 import { ProfileInfo } from '@/src/components/profile/ProfileInfo';
 import { ProfileEdit } from '@/src/components/profile/ProfileEdit';
 import { useAuthStore } from '@/src/lib/useAuthStore';
+import { authAPI } from '@/src/services/auth';
 import Link from 'next/link';
 
 export default function ProfilePage() {
     const { user, setUser } = useAuthStore();
     const [isEditing, setIsEditing] = useState(false);
     const router = useRouter();
+
+    useEffect(() => {
+        const refreshUserProfile = async () => {
+            const token = localStorage.getItem('auth_token');
+            if (!token) {
+                return;
+            }
+
+            try {
+                const latestUser = await authAPI.getCurrentUser();
+                setUser(latestUser);
+            } catch {
+                // Ignore refresh failures here; Header handles token invalidation globally.
+            }
+        };
+
+        refreshUserProfile();
+    }, [setUser]);
 
     if (!user) {
         // Redirect to login handled by protected route or client-side check

@@ -65,3 +65,6 @@ env/
 
 # Turborepo
 .turbo/
+
+# Agent
+.agent/

@@ -10,7 +10,7 @@ from apps.api.modules.auth.schemas import (
 )
 from apps.api.modules.auth.service import (
     create_user, authenticate_user, create_access_token, get_current_user,
-    update_user, change_password, upgrade_to_pro,
+    update_user, change_password,
     check_and_update_subscription_status, get_subscription_status
 )
 from apps.api.modules.auth.database import get_db
@@ -253,45 +253,7 @@ async def pro_upgrade_webhook(
     request: Request,
     db: Session = Depends(get_db)
 ):
-    """PayOS webhook for PRO upgrade payments"""
-    try:
-        payload = await request.json()
-        logging.info(f"PRO upgrade webhook received: {payload}")
-        
-        # Verify webhook signature if needed
-        if payos_client:
-            try:
-                webhook_data = payos_client.verifyPaymentWebhookData(payload)
-            except Exception as e:
-                logging.error(f"Webhook verification failed: {e}")
-                webhook_data = payload.get("data", {})
-        else:
-            webhook_data = payload.get("data", {})
-        
-        code = payload.get("code")
-        if code != "00":
-            logging.info(f"Payment not successful, code: {code}")
-            return {"success": True, "message": "Acknowledged"}
-        
-        description = webhook_data.get("description", "")
-        
-        # Extract user_id from description (format: "PRO {user_id}")
-        if description.startswith("PRO "):
-            user_id = description.replace("PRO ", "").strip()
-            user = db.query(User).filter(User.id.startswith(user_id)).first()
-            
-            if user:
-                # Upgrade user to PRO
-                upgrade_to_pro(db, user, duration_days=30)
-                logging.info(f"User {user_id} upgraded to PRO successfully")
-                return {"success": True, "message": "User upgraded to PRO"}
-            else:
-                logging.error(f"User not found: {user_id}")
-                return {"success": False, "message": "User not found"}
-        else:
-            logging.error(f"Invalid description format: {description}")
-            return {"success": False, "message": "Invalid description"}
-            
-    except Exception as e:
-        logging.exception("Error processing PRO upgrade webhook")
-        return {"success": False, "message": str(e)}
+    """Backward-compatible endpoint that delegates to the unified PayOS webhook."""
+    from apps.api.modules.payment.router import payos_webhook as unified_payos_webhook
+
+    return await unified_payos_webhook(request=request, db=db)
